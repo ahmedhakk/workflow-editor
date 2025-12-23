@@ -4,7 +4,7 @@ import { useToastStore } from "@components/toast/toast.store";
 
 export default function Header() {
   const exportWorkflow = useWorkflowStore((s) => s.exportWorkflow);
-  const showToast = useToastStore((s) => s.show);
+  const showToast = useToastStore((s) => s.success);
 
   const onSave = async () => {
     const payload = exportWorkflow();
