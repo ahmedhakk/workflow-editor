@@ -8,9 +8,9 @@ import {
   type NodeChange,
 } from "reactflow";
 import type { WorkflowEdge, WorkflowNode, WorkflowNodeType } from "@types";
-import { validateLinearConnection } from "@features/workflow/workflow.rules";
+import { validateConnection } from "@features/workflow/workflow.rules";
 import { serializeWorkflow } from "@features/workflow/workflow.serializer";
-import { useToastStore } from "@components/toast/toast.store";
+import { useToastStore } from "@/components/ui/toast/toast.store";
 
 type WorkflowState = {
   nodes: WorkflowNode[];
@@ -111,7 +111,7 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
   onConnect: (connection) =>
     set((state) => {
       console.log("CONNECT", connection);
-      const result = validateLinearConnection({
+      const result = validateConnection({
         connection,
         nodes: state.nodes,
         edges: state.edges,

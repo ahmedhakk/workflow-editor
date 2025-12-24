@@ -18,6 +18,7 @@ export default function SmsNode({ data, selected }: NodeProps<any>) {
       subtitle={subtitle}
       icon={<MessageSquareText className="h-4 w-4" />}
       selected={selected}
+      variant="orange"
     />
   );
 }

@@ -1,11 +1,11 @@
 import type { Connection, Edge, Node } from "reactflow";
 
 const ALLOWED_NEXT: Record<string, string[]> = {
-  trigger: ["audience"],
+  trigger: ["audience", "delay", "sms", "whatsapp"],
   audience: ["delay", "sms", "whatsapp"],
-  delay: ["delay", "sms", "whatsapp"], // allow multiple delays
-  sms: ["delay"], // if you want only delay after message
-  whatsapp: ["delay"],
+  delay: ["delay", "sms", "whatsapp"],
+  sms: ["delay", "sms", "whatsapp"],
+  whatsapp: ["delay", "sms", "whatsapp"],
 };
 
 export function countNodesOfType(nodes: Node[], type: string) {
@@ -20,23 +20,36 @@ export function hasOutgoing(edges: Edge[], nodeId: string) {
   return edges.some((e) => e.source === nodeId);
 }
 
-function createsCycle(edges: Edge[], source: string, target: string) {
-  const visited = new Set<string>();
-  let current = source;
-
-  while (true) {
-    if (visited.has(current)) return true; // already visited => cycle exists
-    visited.add(current);
-
-    const next = edges.find((e) => e.source === current);
-    if (!next) return false;
-
-    if (next.target === target) return true;
-    current = next.target;
+function createsCycle(edges: Edge[], newSource: string, newTarget: string) {
+  // When adding newSource -> newTarget,
+  // cycle exists if newSource is reachable from newTarget.
+  const adjacency = new Map<string, string[]>();
+  for (const e of edges) {
+    const arr = adjacency.get(e.source) ?? [];
+    arr.push(e.target);
+    adjacency.set(e.source, arr);
   }
+
+  const visited = new Set<string>();
+  const stack = [newTarget];
+
+  while (stack.length) {
+    const cur = stack.pop()!;
+    if (cur === newSource) return true;
+    if (visited.has(cur)) continue;
+    visited.add(cur);
+    const next = adjacency.get(cur) ?? [];
+    for (const n of next) stack.push(n);
+  }
+
+  return false;
 }
 
-export function validateLinearConnection(args: {
+export function validateConnection(args: {
+  // ✅ This allows multiple children from any node (Trigger/Audience included)
+  // ✅ Still prevents cycles
+  // ✅ Still prevents merging (optional rule)
+
   connection: Connection;
   nodes: Node[];
   edges: Edge[];
@@ -60,28 +73,32 @@ export function validateLinearConnection(args: {
 
   const sourceNode = nodes.find((n) => n.id === source);
   const targetNode = nodes.find((n) => n.id === target);
-
   if (!sourceNode || !targetNode) return { valid: false };
 
+  // Trigger cannot have incoming edges
+  if (targetNode.type === "trigger") {
+    return { valid: false, reason: "Trigger must be the first step" };
+  }
+
+  // Allowed transitions by type
   const allowed = ALLOWED_NEXT[sourceNode.type ?? ""] ?? [];
   if (!allowed.includes(targetNode.type ?? "")) {
     return { valid: false, reason: "This step cannot connect to that step" };
   }
 
-  if (targetNode.type === "trigger")
-    return { valid: false, reason: "Trigger must be the first step" };
+  /* OPTIONAL: keep “no merging” rule (target can only have one parent)
+    SMS → Delay
+    WhatsApp → Delay
+    (two parents into one Delay)
+  */
+  // if (hasIncoming(edges, target)) {
+  //   return { valid: false, reason: "This step already has a previous step" };
+  // }
 
-  if (hasOutgoing(edges, source))
-    return { valid: false, reason: "This step already has a next step" };
-
-  if (hasIncoming(edges, target))
-    return { valid: false, reason: "This step already has a previous step" };
-
-  if (sourceNode.type === "trigger" && targetNode.type !== "audience")
-    return { valid: false, reason: "Trigger must connect to Audience first" };
-
-  if (createsCycle(edges, target, source))
+  // Prevent cycles in a branching graph
+  if (createsCycle(edges, source, target)) {
     return { valid: false, reason: "This connection creates a cycle" };
+  }
 
   return { valid: true };
 }

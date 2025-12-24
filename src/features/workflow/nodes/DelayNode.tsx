@@ -15,6 +15,7 @@ export default function DelayNode({ data, selected }: NodeProps<any>) {
       subtitle={subtitle}
       icon={<Clock className="h-4 w-4" />}
       selected={selected}
+      variant="gray"
     />
   );
 }

@@ -1,8 +1,10 @@
 import type { NodeProps } from "reactflow";
-import { Zap } from "lucide-react";
 import BaseNode from "./BaseNode";
+import { WORKFLOW_NODE_REGISTRY } from "@features/workflow/workflow.registry";
 
 export default function TriggerNode({ data, selected }: NodeProps<any>) {
+  const r = WORKFLOW_NODE_REGISTRY.trigger;
+
   const triggerType = data?.config?.triggerType ?? "event";
   const eventName = data?.config?.eventName;
   const at = data?.config?.schedule?.at;
@@ -20,12 +22,13 @@ export default function TriggerNode({ data, selected }: NodeProps<any>) {
 
   return (
     <BaseNode
-      title={data?.label ?? "Trigger"}
+      title={data?.label ?? r.label}
       subtitle={subtitle}
-      icon={<Zap className="h-4 w-4" />}
+      icon={r.icon}
       selected={selected}
       hasTarget={false}
       hasSource
+      variant={r.variant}
     />
   );
 }

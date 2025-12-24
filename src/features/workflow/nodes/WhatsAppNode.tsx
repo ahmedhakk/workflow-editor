@@ -12,6 +12,7 @@ export default function WhatsAppNode({ data, selected }: NodeProps<any>) {
       subtitle={subtitle}
       icon={<MessageCircle className="h-4 w-4" />}
       selected={selected}
+      variant="green"
     />
   );
 }

@@ -1,6 +1,6 @@
 import { User, Save, Play } from "lucide-react";
 import { useWorkflowStore } from "@features/workflow/workflow.store";
-import { useToastStore } from "@components/toast/toast.store";
+import { useToastStore } from "@/components/ui/toast/toast.store";
 
 export default function Header() {
   const exportWorkflow = useWorkflowStore((s) => s.exportWorkflow);

@@ -19,6 +19,7 @@ export default function AudienceNode({ data, selected }: NodeProps<any>) {
       subtitle={subtitle}
       icon={<Users className="h-4 w-4" />}
       selected={selected}
+      variant="blue"
     />
   );
 }

@@ -10,7 +10,7 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 import { useWorkflowStore } from "@features/workflow/workflow.store";
 import { nodeTypes } from "@features/workflow/nodes";
-import { validateLinearConnection } from "@features/workflow/workflow.rules";
+import { validateConnection } from "@features/workflow/workflow.rules";
 
 export default function WorkflowCanvas() {
   const nodes = useWorkflowStore((s) => s.nodes);
@@ -67,7 +67,7 @@ export default function WorkflowCanvas() {
 
   const isValidConnection = useCallback(
     (connection: Connection) =>
-      validateLinearConnection({ connection, nodes, edges }).valid,
+      validateConnection({ connection, nodes, edges }).valid,
     [nodes, edges]
   );
   return (
