@@ -1,9 +1,10 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import ReactFlow, {
   Background,
   Controls,
   MiniMap,
   useReactFlow,
+  MarkerType,
   type Connection,
 } from "reactflow";
 
@@ -11,6 +12,14 @@ import "reactflow/dist/style.css";
 import { useWorkflowStore } from "@features/workflow/workflow.store";
 import { nodeTypes } from "@features/workflow/nodes";
 import { validateConnection } from "@features/workflow/workflow.rules";
+
+const EDGE_COLOR_BY_TYPE: Record<string, string> = {
+  trigger: "rgb(168, 85, 247)", // purple-500
+  audience: "rgb(14, 165, 233)", // sky-500
+  whatsapp: "rgb(16, 185, 129)", // emerald-500
+  sms: "rgb(249, 115, 22)", // orange-500
+  delay: "rgb(113, 113, 122)", // zinc-500
+};
 
 export default function WorkflowCanvas() {
   const nodes = useWorkflowStore((s) => s.nodes);
@@ -70,6 +79,29 @@ export default function WorkflowCanvas() {
       validateConnection({ connection, nodes, edges }).valid,
     [nodes, edges]
   );
+
+  const nodesById = useMemo(() => {
+    const m = new Map<string, any>();
+    for (const n of nodes) m.set(n.id, n);
+    return m;
+  }, [nodes]);
+
+  const decoratedEdges = useMemo(() => {
+    return edges.map((e) => {
+      const sourceType = nodesById.get(e.source)?.type ?? "delay";
+      const stroke = EDGE_COLOR_BY_TYPE[sourceType] ?? "rgb(148, 163, 184)";
+
+      return {
+        ...e,
+        style: {
+          ...(e.style ?? {}),
+          stroke,
+          strokeWidth: 2,
+        },
+      };
+    });
+  }, [edges, nodesById]);
+
   return (
     <div
       className="relative h-full w-full outline-none"
@@ -80,7 +112,7 @@ export default function WorkflowCanvas() {
     >
       <ReactFlow
         nodes={nodes}
-        edges={edges}
+        edges={decoratedEdges}
         nodeTypes={nodeTypes}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
@@ -93,6 +125,10 @@ export default function WorkflowCanvas() {
           selectEdge(null);
         }}
         fitView
+        defaultEdgeOptions={{
+          markerEnd: { type: MarkerType.ArrowClosed },
+          style: { strokeWidth: 2 },
+        }}
       >
         <MiniMap />
         <Controls />

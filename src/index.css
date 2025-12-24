@@ -1,1 +1,13 @@
 @import "tailwindcss";
+
+/* Make edges look like moving dashed lines */
+.react-flow__edge-path {
+    stroke-dasharray: 6 6;
+    animation: rf-dash-move 0.9s linear infinite;
+}
+
+@keyframes rf-dash-move {
+    to {
+        stroke-dashoffset: -12;
+    }
+}

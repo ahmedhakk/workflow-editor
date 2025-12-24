@@ -3,6 +3,7 @@ import {
   addEdge,
   applyNodeChanges,
   applyEdgeChanges,
+  MarkerType,
   type Connection,
   type EdgeChange,
   type NodeChange,
@@ -126,7 +127,13 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
 
       return {
         edges: addEdge(
-          { ...connection, id: `e-${crypto.randomUUID().slice(0, 8)}` },
+          {
+            ...connection,
+            id: `e-${crypto.randomUUID().slice(0, 8)}`,
+            markerEnd: { type: MarkerType.ArrowClosed },
+            style: { strokeWidth: 2 },
+            labelStyle: { fontSize: 12 },
+          },
           state.edges
         ),
       };
