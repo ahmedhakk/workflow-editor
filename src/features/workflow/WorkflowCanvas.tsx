@@ -21,6 +21,11 @@ const EDGE_COLOR_BY_TYPE: Record<string, string> = {
   delay: "rgb(113, 113, 122)", // zinc-500
 };
 
+const CONDITION_EDGE_COLORS = {
+  if: "rgb(16, 185, 129)", // emerald-500 (green)
+  else: "rgb(239, 68, 68)", // red-500
+};
+
 // const EDGE_TYPES = ["smoothstep", "bezier", "step", "straight"] as const;
 
 export default function WorkflowCanvas() {
@@ -90,8 +95,22 @@ export default function WorkflowCanvas() {
 
   const decoratedEdges = useMemo(() => {
     return edges.map((e) => {
-      const sourceType = nodesById.get(e.source)?.type ?? "delay";
-      const stroke = EDGE_COLOR_BY_TYPE[sourceType] ?? "rgb(148, 163, 184)";
+      let stroke = "rgb(113, 113, 122)"; // default gray
+
+      const sourceNode = nodesById.get(e.source);
+
+      // ✅ Special case: condition node
+      if (sourceNode?.type === "condition") {
+        if (e.sourceHandle === "if") {
+          stroke = CONDITION_EDGE_COLORS.if;
+        } else if (e.sourceHandle === "else") {
+          stroke = CONDITION_EDGE_COLORS.else;
+        }
+      }
+      // ✅ Normal nodes: color by source node type
+      else if (sourceNode?.type) {
+        stroke = EDGE_COLOR_BY_TYPE[sourceNode.type] ?? "rgb(113, 113, 122)";
+      }
 
       return {
         ...e,
@@ -99,6 +118,10 @@ export default function WorkflowCanvas() {
           ...(e.style ?? {}),
           stroke,
           strokeWidth: 2,
+        },
+        markerEnd: {
+          type: MarkerType.ArrowClosed,
+          color: stroke,
         },
       };
     });
