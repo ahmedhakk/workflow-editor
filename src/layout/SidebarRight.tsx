@@ -267,6 +267,48 @@ export default function SidebarRight() {
             </>
           )}
 
+          {selectedNode!.type === "condition" && (
+            <>
+              <div>
+                <FieldLabel>Field</FieldLabel>
+                <Input
+                  value={config.field ?? ""}
+                  onChange={(e) =>
+                    setConfig({ ...config, field: e.target.value })
+                  }
+                  placeholder="event.payload.amount"
+                />
+              </div>
+
+              <div>
+                <FieldLabel>Operator</FieldLabel>
+                <Select
+                  value={config.operator ?? "equals"}
+                  onChange={(e) =>
+                    setConfig({ ...config, operator: e.target.value })
+                  }
+                >
+                  <option value="equals">Equals</option>
+                  <option value="not_equals">Not equals</option>
+                  <option value="contains">Contains</option>
+                  <option value="gt">Greater than</option>
+                  <option value="lt">Less than</option>
+                </Select>
+              </div>
+
+              <div>
+                <FieldLabel>Value</FieldLabel>
+                <Input
+                  value={config.value ?? ""}
+                  onChange={(e) =>
+                    setConfig({ ...config, value: e.target.value })
+                  }
+                  placeholder="1000"
+                />
+              </div>
+            </>
+          )}
+
           {selectedNode!.type === "sms" && (
             <>
               <div>

@@ -1,11 +1,12 @@
 import type { Connection, Edge, Node } from "reactflow";
 
 const ALLOWED_NEXT: Record<string, string[]> = {
-  trigger: ["audience", "delay", "sms", "whatsapp"],
-  audience: ["delay", "sms", "whatsapp"],
-  delay: ["delay", "sms", "whatsapp"],
-  sms: ["delay", "sms", "whatsapp"],
-  whatsapp: ["delay", "sms", "whatsapp"],
+  trigger: ["audience", "condition", "delay", "sms", "whatsapp"],
+  audience: ["condition", "delay", "sms", "whatsapp"],
+  condition: ["delay", "sms", "whatsapp", "condition"],
+  delay: ["condition", "delay", "sms", "whatsapp"],
+  sms: ["delay", "condition", "sms", "whatsapp"],
+  whatsapp: ["delay", "condition", "sms", "whatsapp"],
 };
 
 export function countNodesOfType(nodes: Node[], type: string) {
@@ -20,9 +21,9 @@ export function hasOutgoing(edges: Edge[], nodeId: string) {
   return edges.some((e) => e.source === nodeId);
 }
 
+// DAG-safe cycle detection for branching graphs.
+// When adding newSource -> newTarget, a cycle exists if newSource is reachable from newTarget.
 function createsCycle(edges: Edge[], newSource: string, newTarget: string) {
-  // When adding newSource -> newTarget,
-  // cycle exists if newSource is reachable from newTarget.
   const adjacency = new Map<string, string[]>();
   for (const e of edges) {
     const arr = adjacency.get(e.source) ?? [];
@@ -38,6 +39,7 @@ function createsCycle(edges: Edge[], newSource: string, newTarget: string) {
     if (cur === newSource) return true;
     if (visited.has(cur)) continue;
     visited.add(cur);
+
     const next = adjacency.get(cur) ?? [];
     for (const n of next) stack.push(n);
   }
@@ -45,11 +47,17 @@ function createsCycle(edges: Edge[], newSource: string, newTarget: string) {
   return false;
 }
 
-export function validateConnection(args: {
-  // ✅ This allows multiple children from any node (Trigger/Audience included)
-  // ✅ Still prevents cycles
-  // ✅ Still prevents merging (optional rule)
+function hasOutgoingFromHandle(
+  edges: Edge[],
+  nodeId: string,
+  handleId: string
+) {
+  return edges.some(
+    (e) => e.source === nodeId && (e.sourceHandle ?? "") === handleId
+  );
+}
 
+export function validateConnection(args: {
   connection: Connection;
   nodes: Node[];
   edges: Edge[];
@@ -63,17 +71,33 @@ export function validateConnection(args: {
   if (source === target)
     return { valid: false, reason: "Cannot connect a step to itself" };
 
-  // only allow out -> in connections
-  if (connection.sourceHandle && connection.sourceHandle !== "out") {
-    return { valid: false, reason: "Connect from the bottom handle (output)" };
-  }
-  if (connection.targetHandle && connection.targetHandle !== "in") {
-    return { valid: false, reason: "Connect to the top handle (input)" };
-  }
-
   const sourceNode = nodes.find((n) => n.id === source);
   const targetNode = nodes.find((n) => n.id === target);
   if (!sourceNode || !targetNode) return { valid: false };
+
+  // ✅ Target must always be the input handle "in"
+  if (connection.targetHandle && connection.targetHandle !== "in") {
+    return { valid: false, reason: "Connect to the input handle (in)" };
+  }
+
+  // ✅ Source handle rules depend on node type:
+  // - normal nodes use "out"
+  // - condition node uses "if" or "else"
+  if (sourceNode.type === "condition") {
+    if (
+      connection.sourceHandle !== "if" &&
+      connection.sourceHandle !== "else"
+    ) {
+      return {
+        valid: false,
+        reason: "Use IF/ELSE outputs on the condition node",
+      };
+    }
+  } else {
+    if (connection.sourceHandle && connection.sourceHandle !== "out") {
+      return { valid: false, reason: "Connect from the output handle (out)" };
+    }
+  }
 
   // Trigger cannot have incoming edges
   if (targetNode.type === "trigger") {
@@ -87,9 +111,9 @@ export function validateConnection(args: {
   }
 
   /* OPTIONAL: keep “no merging” rule (target can only have one parent)
-    SMS → Delay
-    WhatsApp → Delay
-    (two parents into one Delay)
+    Example merge:
+      SMS → Delay
+      WhatsApp → Delay
   */
   // if (hasIncoming(edges, target)) {
   //   return { valid: false, reason: "This step already has a previous step" };
@@ -98,6 +122,24 @@ export function validateConnection(args: {
   // Prevent cycles in a branching graph
   if (createsCycle(edges, source, target)) {
     return { valid: false, reason: "This connection creates a cycle" };
+  }
+
+  /* 
+    Condition branches: only one connection per output handle (IF/ELSE)
+    Allows:
+      Condition (IF)   → SMS
+      Condition (ELSE) → WhatsApp
+    Blocks:
+      Condition (IF)   → two different nodes
+  */
+  if (sourceNode.type === "condition") {
+    const h = connection.sourceHandle!;
+    if (hasOutgoingFromHandle(edges, source, h)) {
+      return {
+        valid: false,
+        reason: `The ${h.toUpperCase()} branch is already connected`,
+      };
+    }
   }
 
   return { valid: true };

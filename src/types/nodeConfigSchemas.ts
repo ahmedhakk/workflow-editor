@@ -23,6 +23,12 @@ export type DelayConfig = {
   minutes?: number;
 };
 
+export type ConditionConfig = {
+  field?: string;
+  operator?: "equals" | "not_equals" | "greater_than" | "less_than";
+  value?: string;
+};
+
 export function defaultConfigByType(type?: string) {
   switch (type) {
     case "trigger":
@@ -35,6 +41,12 @@ export function defaultConfigByType(type?: string) {
       return { templateId: "", variables: {} } as WhatsAppConfig;
     case "delay":
       return { minutes: 10 } as DelayConfig;
+    case "condition":
+      return {
+        field: "", // event.payload.amount
+        operator: "equals",
+        value: "",
+      } as ConditionConfig;
     default:
       return {};
   }

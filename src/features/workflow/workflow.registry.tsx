@@ -5,6 +5,7 @@ import {
   MessageCircle,
   MessageSquareText,
   Clock,
+  GitBranch,
 } from "lucide-react";
 
 export type WorkflowNodeType =
@@ -12,7 +13,8 @@ export type WorkflowNodeType =
   | "audience"
   | "sms"
   | "whatsapp"
-  | "delay";
+  | "delay"
+  | "condition";
 export type NodeVariant = "purple" | "blue" | "green" | "orange" | "gray";
 
 export const WORKFLOW_NODE_REGISTRY: Record<
@@ -53,5 +55,11 @@ export const WORKFLOW_NODE_REGISTRY: Record<
     variant: "gray",
     icon: <Clock className="h-4 w-4" />,
     tooltip: "Wait before running the next step",
+  },
+  condition: {
+    label: "IF / ELSE",
+    variant: "green",
+    icon: <GitBranch className="h-4 w-4" />,
+    tooltip: "Branch the workflow based on a rule (IF / ELSE)",
   },
 };

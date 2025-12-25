@@ -8,6 +8,7 @@ import HoverTip from "@components/ui/HoverTip";
 const NODE_TYPES: WorkflowNodeType[] = [
   "trigger",
   "audience",
+  "condition",
   "sms",
   "whatsapp",
   "delay",

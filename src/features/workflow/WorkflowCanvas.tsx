@@ -21,6 +21,8 @@ const EDGE_COLOR_BY_TYPE: Record<string, string> = {
   delay: "rgb(113, 113, 122)", // zinc-500
 };
 
+// const EDGE_TYPES = ["smoothstep", "bezier", "step", "straight"] as const;
+
 export default function WorkflowCanvas() {
   const nodes = useWorkflowStore((s) => s.nodes);
   const edges = useWorkflowStore((s) => s.edges);
@@ -128,6 +130,7 @@ export default function WorkflowCanvas() {
         defaultEdgeOptions={{
           markerEnd: { type: MarkerType.ArrowClosed },
           style: { strokeWidth: 2 },
+          // type: EDGE_TYPES[0],
         }}
       >
         <MiniMap />
