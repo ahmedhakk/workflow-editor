@@ -57,6 +57,14 @@ function hasOutgoingFromHandle(
   );
 }
 
+function hasEdgeFromSourceToTarget(
+  edges: Edge[],
+  sourceId: string,
+  targetId: string
+) {
+  return edges.some((e) => e.source === sourceId && e.target === targetId);
+}
+
 export function validateConnection(args: {
   connection: Connection;
   nodes: Node[];
@@ -133,11 +141,21 @@ export function validateConnection(args: {
       Condition (IF)   → two different nodes
   */
   if (sourceNode.type === "condition") {
-    const h = connection.sourceHandle!;
+    const h = connection.sourceHandle!; // "if" | "else"
+
+    // 1) one connection per branch handle
     if (hasOutgoingFromHandle(edges, source, h)) {
       return {
         valid: false,
         reason: `The ${h.toUpperCase()} branch is already connected`,
+      };
+    }
+
+    // 2) IF and ELSE can't connect to the same target
+    if (hasEdgeFromSourceToTarget(edges, source, target)) {
+      return {
+        valid: false,
+        reason: "IF and ELSE cannot connect to the same step",
       };
     }
   }
