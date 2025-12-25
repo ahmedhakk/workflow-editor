@@ -1,6 +1,6 @@
 import { Handle, Position } from "reactflow";
 
-type Variant = "purple" | "blue" | "green" | "gray" | "orange";
+type Variant = "purple" | "blue" | "green" | "gray" | "orange" | "yellow";
 
 const VARIANT_STYLES: Record<
   Variant,
@@ -46,6 +46,13 @@ const VARIANT_STYLES: Record<
     badgeBg: "bg-zinc-500/15",
     badgeText: "text-zinc-200",
     handleBorder: "!border-zinc-300/80",
+  },
+  yellow: {
+    border: "border-yellow-500/40",
+    glow: "shadow-[0_0_0_1px_rgba(234,179,8,0.25),0_10px_25px_rgba(0,0,0,0.35)]",
+    badgeBg: "bg-yellow-500/15",
+    badgeText: "text-yellow-200",
+    handleBorder: "!border-yellow-300/80",
   },
 };
 

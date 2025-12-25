@@ -162,9 +162,11 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
     const labelMap: Record<WorkflowNodeType, string> = {
       trigger: "Trigger",
       audience: "Audience",
+      condition: "IF / ELSE",
       sms: "Send SMS",
       whatsapp: "Send WhatsApp",
       delay: "Delay",
+      notification: "Send Notification",
     };
 
     const newNode: WorkflowNode = {
@@ -201,8 +203,10 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
     const labelMap: Record<string, string> = {
       trigger: "Trigger",
       audience: "Audience",
+      condition: "IF / ELSE",
       sms: "Send SMS",
       whatsapp: "Send WhatsApp",
+      notification: "Send Notification",
       delay: "Delay",
     };
 

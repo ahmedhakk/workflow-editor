@@ -3,6 +3,7 @@ import AudienceNode from "./AudienceNode";
 import SmsNode from "./SmsNode";
 import WhatsAppNode from "./WhatsAppNode";
 import DelayNode from "./DelayNode";
+import NotificationNode from "./NotificationNode";
 import ConditionNode from "./ConditionNode";
 
 export const nodeTypes = {
@@ -12,4 +13,5 @@ export const nodeTypes = {
   whatsapp: WhatsAppNode,
   delay: DelayNode,
   condition: ConditionNode,
+  notification: NotificationNode,
 };

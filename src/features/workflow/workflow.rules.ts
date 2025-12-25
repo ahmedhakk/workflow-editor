@@ -1,12 +1,20 @@
 import type { Connection, Edge, Node } from "reactflow";
 
 const ALLOWED_NEXT: Record<string, string[]> = {
-  trigger: ["audience", "condition", "delay", "sms", "whatsapp"],
-  audience: ["condition", "delay", "sms", "whatsapp"],
-  condition: ["delay", "sms", "whatsapp", "condition"],
-  delay: ["condition", "delay", "sms", "whatsapp"],
-  sms: ["delay", "condition", "sms", "whatsapp"],
-  whatsapp: ["delay", "condition", "sms", "whatsapp"],
+  trigger: [
+    "audience",
+    "condition",
+    "delay",
+    "sms",
+    "whatsapp",
+    "notification",
+  ],
+  audience: ["condition", "delay", "sms", "whatsapp", "notification"],
+  condition: ["delay", "sms", "whatsapp", "notification", "condition"],
+  delay: ["condition", "delay", "sms", "whatsapp", "notification"],
+  sms: ["delay", "condition", "sms", "whatsapp", "notification"],
+  whatsapp: ["delay", "condition", "sms", "whatsapp", "notification"],
+  notification: ["delay", "condition", "sms", "whatsapp", "notification"], // or [] if terminal
 };
 
 export function countNodesOfType(nodes: Node[], type: string) {

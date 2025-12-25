@@ -358,6 +358,47 @@ export default function SidebarRight() {
             </>
           )}
 
+          {selectedNode!.type === "notification" && (
+            <>
+              <div>
+                <FieldLabel>Title</FieldLabel>
+                <Input
+                  value={config.title ?? ""}
+                  onChange={(e) =>
+                    setConfig({ ...config, title: e.target.value })
+                  }
+                  placeholder="Salary sent"
+                />
+              </div>
+
+              <div>
+                <FieldLabel>Body</FieldLabel>
+                <Textarea
+                  rows={5}
+                  value={config.body ?? ""}
+                  onChange={(e) =>
+                    setConfig({ ...config, body: e.target.value })
+                  }
+                  placeholder="Your salary has been sent successfully."
+                />
+              </div>
+
+              <div>
+                <FieldLabel>Channel</FieldLabel>
+                <Select
+                  value={config.channel ?? "in_channel"}
+                  onChange={(e) =>
+                    setConfig({ ...config, channel: e.target.value })
+                  }
+                >
+                  <option value="in_channel">In Channel</option>
+                  <option value="in_organization">In Organization</option>
+                  <option value="in_workspace">In Workspace</option>
+                </Select>
+              </div>
+            </>
+          )}
+
           {selectedNode!.type === "delay" && (
             <div>
               <FieldLabel>Delay (minutes)</FieldLabel>

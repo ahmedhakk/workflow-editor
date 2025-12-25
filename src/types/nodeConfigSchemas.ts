@@ -29,6 +29,13 @@ export type ConditionConfig = {
   value?: string;
 };
 
+// QUESTION: "need to ask about NotificationConfig details"
+export type NotificationConfig = {
+  title?: string;
+  body?: string;
+  channel?: "in_workspace" | "in_organization" | "in_channel";
+};
+
 export function defaultConfigByType(type?: string) {
   switch (type) {
     case "trigger":
@@ -47,6 +54,12 @@ export function defaultConfigByType(type?: string) {
         operator: "equals",
         value: "",
       } as ConditionConfig;
+    case "notification":
+      return {
+        title: "",
+        body: "",
+        channel: "in_organization", // future: push/email/etc.
+      } as NotificationConfig;
     default:
       return {};
   }

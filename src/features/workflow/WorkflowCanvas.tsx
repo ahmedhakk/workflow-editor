@@ -18,6 +18,7 @@ const EDGE_COLOR_BY_TYPE: Record<string, string> = {
   audience: "rgb(14, 165, 233)", // sky-500
   whatsapp: "rgb(16, 185, 129)", // emerald-500
   sms: "rgb(249, 115, 22)", // orange-500
+  notification: "rgb(202, 138, 4)", // yellow-600
   delay: "rgb(113, 113, 122)", // zinc-500
 };
 

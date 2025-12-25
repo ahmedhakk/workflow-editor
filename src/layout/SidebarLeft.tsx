@@ -11,6 +11,7 @@ const NODE_TYPES: WorkflowNodeType[] = [
   "condition",
   "sms",
   "whatsapp",
+  "notification",
   "delay",
 ];
 
@@ -54,6 +55,14 @@ const VARIANT_TO_STYLE = {
     badge: "bg-zinc-500/15",
     badgeBorder: "border-zinc-500/30",
     text: "text-zinc-200",
+  },
+  yellow: {
+    border: "border-yellow-500/40",
+    bg: "bg-yellow-950/20",
+    hover: "hover:bg-yellow-950/30",
+    badge: "bg-yellow-500/15",
+    badgeBorder: "border-yellow-500/30",
+    text: "text-yellow-200",
   },
 } as const;
 

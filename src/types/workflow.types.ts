@@ -3,8 +3,10 @@ import type { Edge, Node } from "reactflow";
 export type WorkflowNodeType =
   | "trigger"
   | "audience"
+  | "condition"
   | "sms"
   | "whatsapp"
+  | "notification"
   | "delay";
 
 export type WorkflowNodeData = {
