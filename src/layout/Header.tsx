@@ -23,8 +23,13 @@ export default function Header() {
       <div className="flex h-full items-center justify-between px-4">
         {/* Left */}
         <div className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-lg bg-ui-card" />
-          <div className="leading-tight">
+          {/* https://dreams.com.sa/site/images/logo-white.png */}
+          <img
+            src="/src/assets/logo-white.png"
+            className="w-auto h-6"
+            alt="Dreams Logo"
+          />
+          <div className="leading-tight border-l border-ui-text2 pl-3">
             <div className="text-sm font-semibold">Workflows</div>
             <div className="text-xs text-ui-muted">Draft • Not published</div>
           </div>

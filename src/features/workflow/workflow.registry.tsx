@@ -23,7 +23,8 @@ export type NodeVariant =
   | "green"
   | "orange"
   | "gray"
-  | "yellow";
+  | "yellow"
+  | "red";
 
 export const WORKFLOW_NODE_REGISTRY: Record<
   WorkflowNodeType,
@@ -66,7 +67,7 @@ export const WORKFLOW_NODE_REGISTRY: Record<
   },
   condition: {
     label: "IF / ELSE",
-    variant: "green",
+    variant: "red",
     icon: <GitBranch className="h-4 w-4" />,
     tooltip: "Branch the workflow based on a rule (IF / ELSE)",
   },

@@ -65,6 +65,14 @@ const VARIANT_TO_STYLE = {
     badgeBorder: "border-yellow-500/30",
     text: "text-yellow-200",
   },
+  red: {
+    border: "border-red-500/40",
+    bg: "bg-red-950/20",
+    hover: "hover:bg-red-950/30",
+    badge: "bg-red-500/15",
+    badgeBorder: "border-red-500/30",
+    text: "text-red-200",
+  },
 } as const;
 
 export default function SidebarLeft() {

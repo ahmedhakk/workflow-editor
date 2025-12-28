@@ -27,6 +27,16 @@ const CONDITION_EDGE_COLORS = {
   else: "rgb(239, 68, 68)", // red-500
 };
 
+const MINIMAP_NODE_COLOR: Record<string, string> = {
+  trigger: "#a855f7",
+  audience: "#0ea5e9",
+  whatsapp: "#10b981",
+  condition: "#ef4444",
+  sms: "#f97316",
+  notification: "#ca8a04",
+  delay: "#71717a",
+};
+
 // const EDGE_TYPES = ["smoothstep", "bezier", "step", "straight"] as const;
 
 export default function WorkflowCanvas() {
@@ -157,8 +167,18 @@ export default function WorkflowCanvas() {
           // type: EDGE_TYPES[0],
         }}
       >
-        <MiniMap />
-        <Controls />
+        <MiniMap
+          maskColor="rgba(27, 31, 40, 0.70)" // ui.canvas with opacity
+          style={{
+            backgroundColor: "#141824", // ui.panel
+            border: "1px solid #2b3242", // ui.border
+            borderRadius: 12,
+          }}
+          nodeColor={(n) => MINIMAP_NODE_COLOR[n.type ?? ""] ?? "#2b3242"}
+          nodeStrokeColor={(n) => MINIMAP_NODE_COLOR[n.type ?? ""] ?? "#2b3242"}
+          nodeBorderRadius={8}
+        />
+        <Controls className="rf-controls" />
         <Background />
       </ReactFlow>
     </div>

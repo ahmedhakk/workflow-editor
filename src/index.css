@@ -23,7 +23,7 @@
     --color-accent-danger: #ef4444;
 }
 
-/* Custom Scrollbar Styles */
+/* === Start Custom Scrollbar Styles === */
 .custom-scrollbar::-webkit-scrollbar {
     width: 4px;
 }
@@ -44,7 +44,48 @@
     /* zinc-600 */
 }
 
-/* Make edges look like moving dashed lines */
+/* === End Custom Scrollbar Styles === */
+
+/* === Start Controls + - of the canvas === */
+/* Controls container */
+.rf-controls {
+    background: #141824;
+    /* ui.panel */
+    border: 1px solid #2b3242;
+    /* ui.border */
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
+}
+
+/* Each button */
+.rf-controls .react-flow__controls-button {
+    background: transparent;
+    border: none;
+    color: #e6e9f2;
+    /* ui.text */
+}
+
+/* Hover */
+.rf-controls .react-flow__controls-button:hover {
+    background: #202634;
+    /* ui.hover */
+}
+
+/* Divider lines between buttons */
+.rf-controls .react-flow__controls-button+.react-flow__controls-button {
+    border-top: 1px solid #2b3242;
+    /* ui.border */
+}
+
+/* Icon color (svg) */
+.rf-controls svg {
+    fill: #e6e9f2;
+}
+
+/* === End Controls + - of the canvas === */
+
+/* === Start Make edges look like moving dashed lines === */
 .react-flow__edge-path {
     stroke-dasharray: 6 6;
     animation: rf-dash-move 0.9s linear infinite;
@@ -55,3 +96,5 @@
         stroke-dashoffset: -12;
     }
 }
+
+/* === End Make edges look like moving dashed lines === */

@@ -19,7 +19,7 @@ export default function ConditionNode({ data, selected }: NodeProps<any>) {
         id="in"
         type="target"
         position={Position.Left}
-        className="h-3! w-3! border-2! bg-zinc-950! border-emerald-300/80!"
+        className="h-3! w-3! border-2! bg-zinc-950! border-red-300/80!"
       />
 
       <BaseNode
@@ -38,9 +38,9 @@ export default function ConditionNode({ data, selected }: NodeProps<any>) {
         type="source"
         position={Position.Right}
         style={{ top: "35%" }}
-        className="h-3! w-3! border-2! bg-zinc-950! border-emerald-300/80!"
+        className="h-3! w-3! border-2! bg-zinc-950! border-red-300/80!"
       />
-      <div className="pointer-events-none absolute right-4 top-[28%] text-[10px] text-emerald-200">
+      <div className="pointer-events-none absolute right-4 top-[28%] text-[10px] text-red-200">
         IF
       </div>
 
@@ -50,9 +50,9 @@ export default function ConditionNode({ data, selected }: NodeProps<any>) {
         type="source"
         position={Position.Right}
         style={{ top: "70%" }}
-        className="h-3! w-3! border-2! bg-zinc-950! border-emerald-300/80!"
+        className="h-3! w-3! border-2! bg-zinc-950! border-red-300/80!"
       />
-      <div className="pointer-events-none absolute right-4 top-[63%] text-[10px] text-emerald-200">
+      <div className="pointer-events-none absolute right-4 top-[63%] text-[10px] text-red-200">
         ELSE
       </div>
     </div>
