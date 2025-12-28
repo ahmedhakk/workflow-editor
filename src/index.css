@@ -1,5 +1,28 @@
 @import "tailwindcss";
 
+/* Tailwind v4 Custom Colors using CSS Variables */
+@theme {
+    --color-ui-canvas: #1b1f28;
+    --color-ui-panel: #141824;
+    --color-ui-card: #0f131c;
+    --color-ui-hover: #202634;
+
+    --color-ui-border: #2b3242;
+    --color-ui-border-soft: #23293a;
+
+    --color-ui-text: #e6e9f2;
+    --color-ui-text2: #a9b1c3;
+    --color-ui-muted: #7c859a;
+    --color-ui-disabled: #525b6f;
+
+    --color-accent-trigger: #a855f7;
+    --color-accent-audience: #0ea5e9;
+    --color-accent-whatsapp: #10b981;
+    --color-accent-sms: #f97316;
+    --color-accent-delay: #71717a;
+    --color-accent-danger: #ef4444;
+}
+
 /* Custom Scrollbar Styles */
 .custom-scrollbar::-webkit-scrollbar {
     width: 4px;

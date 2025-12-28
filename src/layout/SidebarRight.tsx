@@ -5,7 +5,7 @@ import { useToastStore } from "@/components/ui/toast/toast.store";
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mb-1 text-xs font-medium text-zinc-300">{children}</div>
+    <div className="mb-1 text-xs font-medium text-ui-text2">{children}</div>
   );
 }
 
@@ -13,7 +13,7 @@ function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       {...props}
-      className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-700"
+      className="w-full rounded-md border border-ui-border bg-ui-card px-3 py-2 text-sm text-ui-text placeholder:text-ui-muted focus:outline-none focus:ring-2 focus:ring-ui-border-soft"
     />
   );
 }
@@ -22,7 +22,7 @@ function Textarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <textarea
       {...props}
-      className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-700"
+      className="w-full rounded-md border border-ui-border bg-ui-card px-3 py-2 text-sm text-ui-text placeholder:text-ui-muted focus:outline-none focus:ring-2 focus:ring-ui-border-soft"
     />
   );
 }
@@ -31,14 +31,14 @@ function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
   return (
     <select
       {...props}
-      className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-700"
+      className="w-full rounded-md border border-ui-border bg-ui-card px-3 py-2 text-sm text-ui-text focus:outline-none focus:ring-2 focus:ring-ui-border-soft"
     />
   );
 }
 
 function pill(text: string) {
   return (
-    <span className="inline-flex items-center rounded-md border border-zinc-800 bg-zinc-900 px-2 py-0.5 text-xs text-zinc-200">
+    <span className="inline-flex items-center rounded-md border border-ui-border bg-ui-card px-2 py-0.5 text-xs text-ui-text2">
       {text}
     </span>
   );
@@ -80,12 +80,12 @@ export default function SidebarRight() {
   if (!selectedNode && !selectedEdge) {
     return (
       <aside
-        className={`relative h-full border-l border-zinc-800 bg-zinc-950 transition-all duration-300 ${isCollapsed ? "w-12" : "w-80"}`}
+        className={`relative h-full border-l border-ui-border bg-ui-panel transition-all duration-300 ${isCollapsed ? "w-12" : "w-80"}`}
       >
         {/* Toggle Button */}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="absolute -left-3 top-1/2 z-10 flex h-6 w-6 items-center justify-center rounded-full border border-zinc-700 bg-zinc-900 text-zinc-400 shadow-lg hover:bg-zinc-800 hover:text-zinc-200"
+          className="absolute -left-3 top-1/2 z-10 flex h-6 w-6 items-center justify-center rounded-full border border-ui-border bg-ui-card text-ui-muted shadow-lg hover:bg-ui-hover hover:text-ui-text"
           title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           <svg
@@ -117,11 +117,11 @@ export default function SidebarRight() {
           className={`transition-opacity duration-300 ${isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100 p-3"}`}
         >
           <div className="mb-2 text-sm font-semibold">Inspector</div>
-          <div className="text-sm text-zinc-400">
+          <div className="text-sm text-ui-muted">
             Select a node or connection to edit.
           </div>
 
-          <div className="mt-4 rounded-lg border border-zinc-800 bg-zinc-900 p-3 text-sm text-zinc-300">
+          <div className="mt-4 rounded-lg border border-ui-border bg-ui-card p-3 text-sm text-ui-text2">
             Tip: click a node or a line (edge) on the canvas.
           </div>
         </div>
@@ -133,12 +133,12 @@ export default function SidebarRight() {
   if (!selectedNode && selectedEdge) {
     return (
       <aside
-        className={`relative h-full border-l border-zinc-800 bg-zinc-950 transition-all duration-300 ${isCollapsed ? "w-12" : "w-80"}`}
+        className={`relative h-full border-l border-ui-border bg-ui-panel transition-all duration-300 ${isCollapsed ? "w-12" : "w-80"}`}
       >
         {/* Toggle Button */}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="absolute -left-3 top-3 z-10 flex h-6 w-6 items-center justify-center rounded-full border border-zinc-700 bg-zinc-900 text-zinc-400 shadow-lg hover:bg-zinc-800 hover:text-zinc-200"
+          className="absolute -left-3 top-1/2 z-10 flex h-6 w-6 items-center justify-center rounded-full border border-ui-border bg-ui-card text-ui-muted shadow-lg hover:bg-ui-hover hover:text-ui-text"
           title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           <svg
@@ -172,7 +172,7 @@ export default function SidebarRight() {
           <div className="p-3">
             <div className="mb-3">
               <div className="text-sm font-semibold">Inspector</div>
-              <div className="text-xs text-zinc-400">
+              <div className="text-xs text-ui-muted">
                 edge • {selectedEdge.id}
               </div>
             </div>
@@ -184,7 +184,7 @@ export default function SidebarRight() {
                   {pill(selectedEdge.source)}
                   {edgeSourceNode?.type ? pill(edgeSourceNode.type) : null}
                 </div>
-                <div className="mt-1 text-xs text-zinc-400">
+                <div className="mt-1 text-xs text-ui-muted">
                   {edgeSourceNode?.data?.label
                     ? `Label: ${edgeSourceNode.data.label}`
                     : "Node label not set"}
@@ -197,7 +197,7 @@ export default function SidebarRight() {
                   {pill(selectedEdge.target)}
                   {edgeTargetNode?.type ? pill(edgeTargetNode.type) : null}
                 </div>
-                <div className="mt-1 text-xs text-zinc-400">
+                <div className="mt-1 text-xs text-ui-muted">
                   {edgeTargetNode?.data?.label
                     ? `Label: ${edgeTargetNode.data.label}`
                     : "Node label not set"}
@@ -206,7 +206,7 @@ export default function SidebarRight() {
 
               <div>
                 <FieldLabel>Handles</FieldLabel>
-                <div className="flex flex-wrap gap-2 text-xs text-zinc-300">
+                <div className="flex flex-wrap gap-2 text-xs text-ui-text2">
                   {pill(`sourceHandle: ${selectedEdge.sourceHandle ?? "—"}`)}
                   {pill(`targetHandle: ${selectedEdge.targetHandle ?? "—"}`)}
                 </div>
@@ -242,12 +242,12 @@ export default function SidebarRight() {
 
   return (
     <aside
-      className={`relative h-full border-l border-zinc-800 bg-zinc-950 transition-all duration-300 ${isCollapsed ? "w-12" : "w-80"}`}
+      className={`relative h-full border-l border-ui-border bg-ui-panel transition-all duration-300 ${isCollapsed ? "w-12" : "w-80"}`}
     >
       {/* Toggle Button */}
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute -left-3 top-3 z-10 flex h-6 w-6 items-center justify-center rounded-full border border-zinc-700 bg-zinc-900 text-zinc-400 shadow-lg hover:bg-zinc-800 hover:text-zinc-200"
+        className="absolute -left-3 top-1/2 z-10 flex h-6 w-6 items-center justify-center rounded-full border border-ui-border bg-ui-card text-ui-muted shadow-lg hover:bg-ui-hover hover:text-ui-text"
         title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
       >
         <svg
@@ -281,7 +281,7 @@ export default function SidebarRight() {
         <div className="p-3">
           <div className="mb-3">
             <div className="text-sm font-semibold">Inspector</div>
-            <div className="text-xs text-zinc-400">
+            <div className="text-xs text-ui-muted">
               {selectedNode!.type ?? "step"} • {selectedNode!.id}
             </div>
           </div>
@@ -444,7 +444,7 @@ export default function SidebarRight() {
                     }
                     placeholder="Your salary has been sent."
                   />
-                  <div className="mt-1 text-xs text-zinc-400">
+                  <div className="mt-1 text-xs text-ui-muted">
                     (Later we’ll add SMS segments + GSM/UCS-2 detection)
                   </div>
                 </div>
@@ -464,7 +464,7 @@ export default function SidebarRight() {
                   />
                 </div>
 
-                <div className="text-xs text-zinc-400">
+                <div className="text-xs text-ui-muted">
                   Next: we’ll add template variable mapping UI.
                 </div>
               </>

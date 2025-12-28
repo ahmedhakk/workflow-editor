@@ -77,12 +77,12 @@ export default function SidebarLeft() {
 
   return (
     <aside
-      className={`relative h-full border-r border-zinc-800 bg-zinc-950 transition-all duration-300 ${isCollapsed ? "w-12" : "w-80"}`}
+      className={`relative h-full border-r border-ui-border bg-ui-panel transition-all duration-300 ${isCollapsed ? "w-12" : "w-80"}`}
     >
       {/* Toggle Button */}
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute -right-3 top-1/2 z-10 flex h-6 w-6 items-center justify-center rounded-full border border-zinc-700 bg-zinc-900 text-zinc-400 shadow-lg hover:bg-zinc-800 hover:text-zinc-200"
+        className="absolute -right-3 top-1/2 z-10 flex h-6 w-6 items-center justify-center rounded-full border border-ui-border bg-ui-card text-ui-muted shadow-lg hover:bg-ui-hover hover:text-ui-text"
         title={isCollapsed ? "Expand Nodes" : "Collapse Nodes"}
       >
         <svg
@@ -113,7 +113,7 @@ export default function SidebarLeft() {
       <div
         className={`h-full flex flex-col transition-opacity duration-300 ${isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100 p-3"}`}
       >
-        <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-400">
+        <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-ui-muted">
           Steps
         </div>
 
@@ -130,7 +130,7 @@ export default function SidebarLeft() {
                 onDragStart={(e) => onDragStart(e, type)}
                 className={[
                   "group cursor-grab rounded-xl border p-3 text-sm active:cursor-grabbing",
-                  "bg-zinc-950/40 backdrop-blur",
+                  "bg-ui-card/80 backdrop-blur",
                   s.border,
                   s.bg,
                   s.hover,
@@ -152,14 +152,14 @@ export default function SidebarLeft() {
 
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold text-zinc-100">
+                      <span className="font-semibold text-ui-text">
                         {r.label}
                       </span>
                       <span className={["text-xs", s.text].join(" ")}>
                         {type}
                       </span>
                     </div>
-                    <div className="mt-0.5 text-xs text-zinc-400">
+                    <div className="mt-0.5 text-xs text-ui-muted">
                       Drag to canvas
                     </div>
                   </div>
