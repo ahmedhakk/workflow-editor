@@ -1,4 +1,5 @@
 import type React from "react";
+import { useState } from "react";
 import {
   WORKFLOW_NODE_REGISTRY,
   type WorkflowNodeType,
@@ -67,68 +68,107 @@ const VARIANT_TO_STYLE = {
 } as const;
 
 export default function SidebarLeft() {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
   const onDragStart = (event: React.DragEvent, nodeType: string) => {
     event.dataTransfer.setData("application/reactflow", nodeType);
     event.dataTransfer.effectAllowed = "move";
   };
 
   return (
-    <div className="p-3">
-      <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-400">
-        Steps
-      </div>
+    <aside
+      className={`relative h-full border-r border-zinc-800 bg-zinc-950 transition-all duration-300 ${isCollapsed ? "w-12" : "w-80"}`}
+    >
+      {/* Toggle Button */}
+      <button
+        onClick={() => setIsCollapsed(!isCollapsed)}
+        className="absolute -right-3 top-1/2 z-10 flex h-6 w-6 items-center justify-center rounded-full border border-zinc-700 bg-zinc-900 text-zinc-400 shadow-lg hover:bg-zinc-800 hover:text-zinc-200"
+        title={isCollapsed ? "Expand Nodes" : "Collapse Nodes"}
+      >
+        <svg
+          className="h-3 w-3"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          {isCollapsed ? (
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 5l7 7-7 7"
+            />
+          ) : (
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
+          )}
+        </svg>
+      </button>
 
-      <div className="space-y-2">
-        {NODE_TYPES.map((type) => {
-          const r = WORKFLOW_NODE_REGISTRY[type];
-          const s = VARIANT_TO_STYLE[r.variant];
+      {/* Sidebar Content */}
+      <div
+        className={`h-full flex flex-col transition-opacity duration-300 ${isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100 p-3"}`}
+      >
+        <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-400">
+          Steps
+        </div>
 
-          return (
-            <div
-              key={type}
-              draggable
-              title={r.tooltip} // ✅ tooltip
-              onDragStart={(e) => onDragStart(e, type)}
-              className={[
-                "group cursor-grab rounded-xl border p-3 text-sm active:cursor-grabbing",
-                "bg-zinc-950/40 backdrop-blur",
-                s.border,
-                s.bg,
-                s.hover,
-              ].join(" ")}
-            >
-              <HoverTip content={r.tooltip} />
+        <div className="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
+          {NODE_TYPES.map((type) => {
+            const r = WORKFLOW_NODE_REGISTRY[type];
+            const s = VARIANT_TO_STYLE[r.variant];
 
-              <div className="flex items-center gap-3">
-                <div
-                  className={[
-                    "h-9 w-9 rounded-xl border flex items-center justify-center transition-transform group-hover:scale-105",
-                    s.badge,
-                    s.badgeBorder,
-                    s.text,
-                  ].join(" ")}
-                >
-                  {r.icon}
-                </div>
+            return (
+              <div
+                key={type}
+                draggable
+                title={r.tooltip} // ✅ tooltip
+                onDragStart={(e) => onDragStart(e, type)}
+                className={[
+                  "group cursor-grab rounded-xl border p-3 text-sm active:cursor-grabbing",
+                  "bg-zinc-950/40 backdrop-blur",
+                  s.border,
+                  s.bg,
+                  s.hover,
+                ].join(" ")}
+              >
+                <HoverTip content={r.tooltip} />
 
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-zinc-100">
-                      {r.label}
-                    </span>
-                    <span className={["text-xs", s.text].join(" ")}>
-                      {type}
-                    </span>
+                <div className="flex items-center gap-3">
+                  <div
+                    className={[
+                      "h-9 w-9 rounded-xl border flex items-center justify-center transition-transform group-hover:scale-105",
+                      s.badge,
+                      s.badgeBorder,
+                      s.text,
+                    ].join(" ")}
+                  >
+                    {r.icon}
                   </div>
-                  <div className="mt-0.5 text-xs text-zinc-400">
-                    Drag to canvas
+
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-zinc-100">
+                        {r.label}
+                      </span>
+                      <span className={["text-xs", s.text].join(" ")}>
+                        {type}
+                      </span>
+                    </div>
+                    <div className="mt-0.5 text-xs text-zinc-400">
+                      Drag to canvas
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </aside>
   );
 }
