@@ -178,7 +178,7 @@ export default function WorkflowCanvas() {
           nodeStrokeColor={(n) => MINIMAP_NODE_COLOR[n.type ?? ""] ?? "#2b3242"}
           nodeBorderRadius={8}
         />
-        <Controls className="rf-controls" />
+        <Controls className="rf-controls" showInteractive={false} />
         <Background />
       </ReactFlow>
     </div>
