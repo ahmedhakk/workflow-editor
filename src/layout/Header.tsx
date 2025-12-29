@@ -25,7 +25,7 @@ export default function Header() {
         <div className="flex items-center gap-3">
           {/* https://dreams.com.sa/site/images/logo-white.png */}
           <img
-            src="https://dreams.com.sa/site/images/logo-white.png"
+            src="/src/assets/logo-white.png"
             className="w-auto h-6"
             alt="Dreams Logo"
           />

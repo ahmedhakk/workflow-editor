@@ -6,14 +6,30 @@ import {
 } from "@features/workflow";
 import HoverTip from "@components/ui/HoverTip";
 
-const NODE_TYPES: WorkflowNodeType[] = [
-  "trigger",
-  "audience",
-  "condition",
-  "sms",
-  "whatsapp",
-  "notification",
-  "delay",
+type CategoryKey = "triggers" | "actions" | "conditions";
+
+const CATEGORIES: Array<{
+  key: CategoryKey;
+  title: string;
+  icon?: React.ReactNode;
+  items: WorkflowNodeType[];
+}> = [
+  {
+    key: "triggers",
+    title: "TRIGGERS",
+    items: ["trigger"], // later: add "scheduleTrigger", "manualTrigger" if you split them
+    // For now, trigger is one node. If later you want “Webhook / Schedule / Manual Trigger” as separate nodes, we’ll add 3 trigger node types.
+  },
+  {
+    key: "actions",
+    title: "ACTIONS",
+    items: ["audience", "sms", "whatsapp", "notification", "delay"],
+  },
+  {
+    key: "conditions",
+    title: "CONDITIONS",
+    items: ["condition"],
+  },
 ];
 
 const VARIANT_TO_STYLE = {
@@ -121,60 +137,69 @@ export default function SidebarLeft() {
       <div
         className={`h-full flex flex-col transition-opacity duration-300 ${isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100 p-3"}`}
       >
-        <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-ui-muted">
+        <div className="mb-3 text-sm font-semibold uppercase tracking-wider text-ui-muted">
           Steps
         </div>
 
-        <div className="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
-          {NODE_TYPES.map((type) => {
-            const r = WORKFLOW_NODE_REGISTRY[type];
-            const s = VARIANT_TO_STYLE[r.variant];
+        <div className="flex-1 overflow-y-auto overflow-x-visible pr-2 custom-scrollbar">
+          <div className="space-y-5">
+            {CATEGORIES.map((cat) => (
+              <div key={cat.key}>
+                <div className="mb-2 flex items-center gap-2 px-1 text-[11px] font-semibold uppercase tracking-wider text-ui-muted">
+                  {/* optional left icon bullet */}
+                  <span className="inline-block h-2 w-2 rounded-full bg-ui-borderSoft" />
+                  {cat.title}
+                </div>
 
-            return (
-              <div
-                key={type}
-                draggable
-                title={r.tooltip} // ✅ tooltip
-                onDragStart={(e) => onDragStart(e, type)}
-                className={[
-                  "group cursor-grab rounded-xl border p-3 text-sm active:cursor-grabbing",
-                  "bg-ui-card/80 backdrop-blur",
-                  s.border,
-                  s.bg,
-                  s.hover,
-                ].join(" ")}
-              >
-                <HoverTip content={r.tooltip} />
+                <div className="space-y-2">
+                  {cat.items.map((type) => {
+                    const r = WORKFLOW_NODE_REGISTRY[type];
+                    const s = VARIANT_TO_STYLE[r.variant];
 
-                <div className="flex items-center gap-3">
-                  <div
-                    className={[
-                      "h-9 w-9 rounded-xl border flex items-center justify-center transition-transform group-hover:scale-105",
-                      s.badge,
-                      s.badgeBorder,
-                      s.text,
-                    ].join(" ")}
-                  >
-                    {r.icon}
-                  </div>
+                    return (
+                      <HoverTip content={r.tooltip}>
+                        <div
+                          key={type}
+                          draggable
+                          onDragStart={(e) => onDragStart(e, type)}
+                          className={[
+                            "group relative cursor-grab rounded-xl border p-3 text-sm active:cursor-grabbing",
+                            "bg-ui-card/80 backdrop-blur",
+                            s.border,
+                            s.bg,
+                            s.hover,
+                          ].join(" ")}
+                        >
+                          <div className="flex items-center gap-3 h-full">
+                            <div
+                              className={[
+                                "h-9 w-9 shrink-0 rounded-xl border flex items-center justify-center transition-transform group-hover:scale-105",
+                                s.badge,
+                                s.badgeBorder,
+                                s.text,
+                              ].join(" ")}
+                            >
+                              {r.icon}
+                            </div>
 
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold text-ui-text">
-                        {r.label}
-                      </span>
-                      <span className={["text-xs", s.text].join(" ")}>
-                        {type}
-                      </span>
-                    </div>
-                    <div className="mt-0.5 text-xs text-ui-muted">
-                      Drag to canvas
-                    </div>
-                  </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="font-semibold text-ui-text truncate">
+                                {r.label}
+                              </div>
+
+                              <div className="mt-0.5 text-xs text-ui-muted truncate">
+                                {r.tooltip}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </HoverTip>
+                    );
+                  })}
                 </div>
               </div>
-            );
-          })}
+            ))}
+          </div>
         </div>
       </div>
     </aside>
