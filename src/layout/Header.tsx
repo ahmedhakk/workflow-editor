@@ -23,7 +23,6 @@ export default function Header() {
       <div className="flex h-full items-center justify-between px-4">
         {/* Left */}
         <div className="flex items-center gap-3">
-          {/* https://dreams.com.sa/site/images/logo-white.png */}
           <img
             src="https://dreams.com.sa/site/images/logo-white.png"
             className="w-auto h-6"

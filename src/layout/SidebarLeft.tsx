@@ -5,6 +5,7 @@ import {
   type WorkflowNodeType,
 } from "@features/workflow";
 import HoverTip from "@components/ui/HoverTip";
+import { Layers, Zap, Boxes, GitBranch } from "lucide-react";
 
 type CategoryKey = "triggers" | "actions" | "conditions";
 
@@ -12,6 +13,8 @@ const CATEGORIES: Array<{
   key: CategoryKey;
   title: string;
   icon?: React.ReactNode;
+  titleClass: string;
+
   items: WorkflowNodeType[];
 }> = [
   {
@@ -19,15 +22,21 @@ const CATEGORIES: Array<{
     title: "TRIGGERS",
     items: ["trigger"], // later: add "scheduleTrigger", "manualTrigger" if you split them
     // For now, trigger is one node. If later you want “Webhook / Schedule / Manual Trigger” as separate nodes, we’ll add 3 trigger node types.
+    icon: <Zap className="h-4 w-4" />,
+    titleClass: "text-purple-400",
   },
   {
     key: "actions",
     title: "ACTIONS",
+    icon: <Boxes className="h-4 w-4" />,
+    titleClass: "text-sky-300",
     items: ["audience", "sms", "whatsapp", "notification", "delay"],
   },
   {
     key: "conditions",
     title: "CONDITIONS",
+    icon: <GitBranch className="h-4 w-4" />,
+    titleClass: "text-emerald-300",
     items: ["condition"],
   },
 ];
@@ -137,17 +146,27 @@ export default function SidebarLeft() {
       <div
         className={`h-full flex flex-col transition-opacity duration-300 ${isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100 p-3"}`}
       >
-        <div className="mb-3 text-sm font-semibold uppercase tracking-wider text-ui-muted">
-          Steps
+        <div className="mb-3 pb-3 px-1 border-b border-ui-muted">
+          <div className="flex items-center gap-2 text-lg font-semibold text-ui-text">
+            <Layers className="h-4 w-4 text-purple-400" />
+            Nodes
+          </div>
+          <div className="mt-1 text-xs text-ui-muted">
+            Drag nodes to the canvas
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto overflow-x-visible pr-2 custom-scrollbar">
           <div className="space-y-5">
             {CATEGORIES.map((cat) => (
               <div key={cat.key}>
-                <div className="mb-2 flex items-center gap-2 px-1 text-[11px] font-semibold uppercase tracking-wider text-ui-muted">
-                  {/* optional left icon bullet */}
-                  <span className="inline-block h-2 w-2 rounded-full bg-ui-borderSoft" />
+                <div
+                  className={[
+                    "mb-2 flex items-center gap-2 px-1 text-[11px] font-semibold uppercase tracking-wider",
+                    cat.titleClass,
+                  ].join(" ")}
+                >
+                  {cat.icon}
                   {cat.title}
                 </div>
 
