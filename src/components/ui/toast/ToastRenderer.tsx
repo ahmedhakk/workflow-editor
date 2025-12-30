@@ -1,4 +1,5 @@
 import { useToastStore } from "@/components/ui/toast/toast.store";
+import { X } from "lucide-react";
 
 export default function ToastRenderer() {
   const toasts = useToastStore((s) => s.toasts);
@@ -13,14 +14,15 @@ export default function ToastRenderer() {
           key={toast.id}
           onClick={() => remove(toast.id)}
           className={[
-            "cursor-pointer rounded-md px-4 py-2 text-sm font-medium shadow-lg",
+            "cursor-pointer rounded-md px-3 py-2 text-sm font-medium shadow-lg flex items-center justify-between gap-2",
             "border backdrop-blur",
             toast.type === "success"
               ? "border-green-800 bg-green-950/90 text-green-100"
               : "border-red-800 bg-red-950/90 text-red-100",
           ].join(" ")}
         >
-          {toast.message}
+          <span>{toast.message}</span>
+          <X className="w-4 h-4" />
         </div>
       ))}
     </div>
