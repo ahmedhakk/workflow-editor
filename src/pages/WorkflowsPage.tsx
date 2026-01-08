@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   Plus,
-  Search,
   Copy,
   Trash2,
   ArrowRight,
@@ -22,7 +21,7 @@ import {
 } from "lucide-react";
 import { Header } from "@layout";
 import ToastRenderer from "@components/ui/toast/ToastRenderer";
-import UserMenu from "@components/ui/UserMenu";
+import { UserMenu, SearchInput, Button } from "@components/ui";
 
 import {
   createWorkflowSeed,
@@ -165,13 +164,13 @@ export default function WorkflowsPage() {
         title={t("workflows.title")}
         subtitle={t("header.projects")}
         rightActions={
-          <button
+          <Button
+            variant="primary"
             onClick={onCreate}
-            className="inline-flex items-center gap-2 rounded-md bg-zinc-100 px-3 py-1.5 text-sm font-medium text-zinc-900 hover:bg-white cursor-pointer"
+            icon={<Plus className="h-4 w-4" />}
           >
-            <Plus className="h-4 w-4" />
             {t("workflows.createWorkflow")}
-          </button>
+          </Button>
         }
       />
 
@@ -302,15 +301,12 @@ export default function WorkflowsPage() {
           <div className="px-6 pt-6">
             <div className="mx-auto w-full max-w-300">
               <div className="flex items-center gap-3">
-                <div className="relative w-full max-w-md">
-                  <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ui-muted" />
-                  <input
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder={t("workflows.searchWorkflows")}
-                    className="w-full rounded-md border border-ui-border bg-ui-card ps-9 pe-3 py-2 text-sm outline-none focus:ring-2 focus:ring-white/10"
-                  />
-                </div>
+                <SearchInput
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder={t("workflows.searchWorkflows")}
+                  containerClassName="w-full max-w-md"
+                />
               </div>
             </div>
           </div>

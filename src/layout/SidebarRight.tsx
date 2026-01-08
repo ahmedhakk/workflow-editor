@@ -4,8 +4,17 @@ import { useWorkflowStore } from "@features/workflow/workflow.store";
 import { defaultConfigByType } from "@types";
 import { useToastStore } from "@/components/ui/toast/toast.store";
 import { useLanguage } from "@hooks";
+import {
+  Input,
+  Textarea,
+  Select,
+  FieldLabel,
+  FieldError,
+  Badge,
+  Pill,
+} from "@/components/ui";
 
-function Badge({
+function ValidationBadge({
   count,
   t,
 }: {
@@ -14,11 +23,11 @@ function Badge({
 }) {
   if (count <= 0) return null;
   return (
-    <span className="inline-flex items-center rounded-md border border-red-500/30 bg-red-500/10 px-2 py-0.5 text-[11px] text-red-200">
+    <Badge variant="error">
       {count === 1
         ? t("canvas.issue", { count })
         : t("canvas.issues", { count })}
-    </span>
+    </Badge>
   );
 }
 
@@ -46,52 +55,6 @@ function hintFor(messageKey: string, t: (key: string) => string) {
     return t("hints.fillNotification");
   if (m.includes("cycle")) return t("hints.removeCycle");
   return "";
-}
-
-function FieldLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="mb-1 text-xs font-medium text-ui-text2">{children}</div>
-  );
-}
-
-function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
-  return (
-    <input
-      {...props}
-      className="w-full rounded-md border border-ui-border bg-ui-card px-3 py-2 text-sm text-ui-text placeholder:text-ui-muted focus:outline-none focus:ring-2 focus:ring-ui-border-soft"
-    />
-  );
-}
-
-function Textarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
-  return (
-    <textarea
-      {...props}
-      className="w-full rounded-md border border-ui-border bg-ui-card px-3 py-2 text-sm text-ui-text placeholder:text-ui-muted focus:outline-none focus:ring-2 focus:ring-ui-border-soft"
-    />
-  );
-}
-
-function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
-  return (
-    <select
-      {...props}
-      className="w-full rounded-md border border-ui-border bg-ui-card px-3 py-2 text-sm text-ui-text focus:outline-none focus:ring-2 focus:ring-ui-border-soft"
-    />
-  );
-}
-
-function pill(text: string) {
-  return (
-    <span className="inline-flex items-center rounded-md border border-ui-border bg-ui-card px-2 py-0.5 text-xs text-ui-text2">
-      {text}
-    </span>
-  );
-}
-
-function InlineError({ text }: { text: string | null }) {
-  if (!text) return null;
-  return <div className="mt-1 text-xs text-red-200">{text}</div>;
 }
 
 export default function SidebarRight() {
@@ -226,7 +189,7 @@ export default function SidebarRight() {
         >
           <div className="mb-2 flex items-center justify-between gap-2">
             <div className="text-sm font-semibold">{t("canvas.inspector")}</div>
-            <Badge count={issueCount} t={t} />
+            <ValidationBadge count={issueCount} t={t} />
           </div>
 
           {/* Validation panel */}
@@ -389,7 +352,7 @@ export default function SidebarRight() {
                 <div className="text-sm font-semibold">
                   {t("canvas.inspector")}
                 </div>
-                <Badge count={issueCount} t={t} />
+                <ValidationBadge count={issueCount} t={t} />
               </div>
               <div className="text-xs text-ui-muted">
                 {t("canvas.edge")} • {selectedEdge.id}
@@ -427,24 +390,28 @@ export default function SidebarRight() {
               <div>
                 <FieldLabel>{t("canvas.source")}</FieldLabel>
                 <div className="flex flex-wrap items-center gap-2">
-                  {pill(selectedEdge.source)}
-                  {edgeSourceNode?.type ? pill(edgeSourceNode.type) : null}
+                  <Pill>{selectedEdge.source}</Pill>
+                  {edgeSourceNode?.type ? (
+                    <Pill>{edgeSourceNode.type}</Pill>
+                  ) : null}
                 </div>
               </div>
 
               <div>
                 <FieldLabel>{t("canvas.target")}</FieldLabel>
                 <div className="flex flex-wrap items-center gap-2">
-                  {pill(selectedEdge.target)}
-                  {edgeTargetNode?.type ? pill(edgeTargetNode.type) : null}
+                  <Pill>{selectedEdge.target}</Pill>
+                  {edgeTargetNode?.type ? (
+                    <Pill>{edgeTargetNode.type}</Pill>
+                  ) : null}
                 </div>
               </div>
 
               <div>
                 <FieldLabel>{t("canvas.handles")}</FieldLabel>
                 <div className="flex flex-wrap gap-2 text-xs text-ui-text2">
-                  {pill(`sourceHandle: ${selectedEdge.sourceHandle ?? "—"}`)}
-                  {pill(`targetHandle: ${selectedEdge.targetHandle ?? "—"}`)}
+                  <Pill>sourceHandle: {selectedEdge.sourceHandle ?? "—"}</Pill>
+                  <Pill>targetHandle: {selectedEdge.targetHandle ?? "—"}</Pill>
                 </div>
               </div>
             </div>
@@ -536,7 +503,7 @@ export default function SidebarRight() {
               <div className="text-sm font-semibold">
                 {t("canvas.inspector")}
               </div>
-              <Badge count={issueCount} t={t} />
+              <ValidationBadge count={issueCount} t={t} />
             </div>
             <div className="text-xs text-ui-muted">
               {selectedNode!.type ?? t("canvas.step")} • {selectedNode!.id}
@@ -608,7 +575,7 @@ export default function SidebarRight() {
                       }
                       placeholder="employees"
                     />
-                    <InlineError text={fieldError("listId")} />
+                    <FieldError error={fieldError("listId")} />
                   </div>
                 )}
               </>
@@ -637,7 +604,7 @@ export default function SidebarRight() {
                     }
                     placeholder="Your salary has been sent."
                   />
-                  <InlineError text={fieldError("message")} />
+                  <FieldError error={fieldError("message")} />
                 </div>
               </>
             )}
@@ -652,7 +619,7 @@ export default function SidebarRight() {
                   }
                   placeholder="salary_notification_v1"
                 />
-                <InlineError text={fieldError("template")} />
+                <FieldError error={fieldError("template")} />
               </div>
             )}
 
@@ -667,7 +634,7 @@ export default function SidebarRight() {
                   }
                   min={0}
                 />
-                <InlineError text={fieldError("minutes")} />
+                <FieldError error={fieldError("minutes")} />
               </div>
             )}
 
@@ -682,7 +649,7 @@ export default function SidebarRight() {
                     }
                     placeholder="Salary sent"
                   />
-                  <InlineError text={fieldError("title")} />
+                  <FieldError error={fieldError("title")} />
                 </div>
                 <div>
                   <FieldLabel>{t("nodeConfig.body")}</FieldLabel>
@@ -694,7 +661,7 @@ export default function SidebarRight() {
                     }
                     placeholder="Your salary has been sent successfully."
                   />
-                  <InlineError text={fieldError("body")} />
+                  <FieldError error={fieldError("body")} />
                 </div>
               </>
             )}
