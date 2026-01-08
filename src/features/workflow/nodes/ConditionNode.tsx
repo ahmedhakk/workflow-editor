@@ -2,8 +2,11 @@ import type { NodeProps } from "reactflow";
 import { Handle, Position } from "reactflow";
 import BaseNode from "./BaseNode";
 import { WORKFLOW_NODE_REGISTRY } from "@features/workflow/workflow.registry";
+import { useWorkflowStore } from "@features/workflow/workflow.store";
+import { useTranslation } from "react-i18next";
 
-export default function ConditionNode({ data, selected }: NodeProps<any>) {
+export default function ConditionNode({ data, selected, id }: NodeProps<any>) {
+  const { t } = useTranslation();
   const r = WORKFLOW_NODE_REGISTRY.condition;
 
   const field = data?.config?.field ?? "field";
@@ -11,6 +14,10 @@ export default function ConditionNode({ data, selected }: NodeProps<any>) {
   const value = data?.config?.value ?? "";
 
   const subtitle = `${field} ${operator} ${value || "…"}`;
+
+  const hasError = useWorkflowStore((s) =>
+    s.validationIssues.some((i) => i.target === "node" && i.id === id)
+  );
 
   return (
     <div className="relative">
@@ -23,12 +30,13 @@ export default function ConditionNode({ data, selected }: NodeProps<any>) {
       />
 
       <BaseNode
-        title={data?.label ?? r.label}
+        title={data?.label ?? t(r.labelKey)}
         subtitle={subtitle}
         icon={r.icon}
         selected={selected}
         hasTarget={false} // we render our own input handle
         hasSource={false} // we render custom outputs
+        hasError={hasError}
         variant={r.variant}
       />
 

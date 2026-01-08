@@ -23,6 +23,13 @@
     --color-accent-danger: #ef4444;
 }
 
+/* === RTL Support === */
+html[dir="rtl"] {
+    font-family: "IBM Plex Sans Arabic", "Segoe UI", system-ui, sans-serif;
+}
+
+/* === End RTL Support === */
+
 /* === Start Custom Scrollbar Styles === */
 .custom-scrollbar::-webkit-scrollbar {
     width: 4px;

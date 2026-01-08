@@ -75,6 +75,7 @@ type Props = {
   subtitle?: string;
   icon?: React.ReactNode;
   selected?: boolean;
+  hasError?: boolean;
   hasTarget?: boolean;
   hasSource?: boolean;
   variant?: Variant;
@@ -85,6 +86,7 @@ export default function BaseNode({
   subtitle,
   icon,
   selected,
+  hasError = false,
   hasTarget = true,
   hasSource = true,
   variant = "gray",
@@ -98,6 +100,9 @@ export default function BaseNode({
         v.border,
         v.glow,
         selected ? "ring-2 ring-zinc-400/60" : "",
+        hasError
+          ? "ring-2 ring-red-500/70 border-red-500/50 shadow-[0_0_0_1px_rgba(239,68,68,0.35),0_10px_25px_rgba(0,0,0,0.35)]"
+          : "",
       ].join(" ")}
     >
       {hasTarget && (

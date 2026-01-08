@@ -1,6 +1,8 @@
-import type { Edge, Node } from "reactflow";
-
-export type WorkflowStatus = "draft" | "published";
+import type { WorkflowEdge, WorkflowNode, WorkflowStatus } from "@types";
+import {
+  buildWorkflowExecution,
+  type WorkflowExecution,
+} from "@features/workflow/workflow.executor";
 
 export type WorkflowPayload = {
   id: string;
@@ -8,21 +10,9 @@ export type WorkflowPayload = {
   status: WorkflowStatus;
   version: number;
   updatedAt: string;
-
-  nodes: Array<{
-    id: string;
-    type?: string;
-    position: { x: number; y: number };
-    data?: any;
-  }>;
-
-  edges: Array<{
-    id: string;
-    source: string;
-    target: string;
-    sourceHandle?: string | null;
-    targetHandle?: string | null;
-  }>;
+  execution?: WorkflowExecution;
+  nodes: WorkflowNode[];
+  edges: WorkflowEdge[];
 };
 
 export function serializeWorkflow(args: {
@@ -30,10 +20,12 @@ export function serializeWorkflow(args: {
   name: string;
   status: WorkflowStatus;
   version?: number;
-  nodes: Node[];
-  edges: Edge[];
+  nodes: WorkflowNode[];
+  edges: WorkflowEdge[];
 }): WorkflowPayload {
   const { id, name, status, version = 1, nodes, edges } = args;
+
+  const execution = buildWorkflowExecution({ nodes, edges });
 
   return {
     id,
@@ -41,18 +33,8 @@ export function serializeWorkflow(args: {
     status,
     version,
     updatedAt: new Date().toISOString(),
-    nodes: nodes.map((n) => ({
-      id: n.id,
-      type: n.type,
-      position: n.position,
-      data: n.data,
-    })),
-    edges: edges.map((e) => ({
-      id: e.id,
-      source: e.source,
-      target: e.target,
-      sourceHandle: e.sourceHandle ?? null,
-      targetHandle: e.targetHandle ?? null,
-    })),
+    execution,
+    nodes,
+    edges,
   };
 }

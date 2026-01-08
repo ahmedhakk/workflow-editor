@@ -42,6 +42,7 @@ const MINIMAP_NODE_COLOR: Record<string, string> = {
 export default function WorkflowCanvas() {
   const nodes = useWorkflowStore((s) => s.nodes);
   const edges = useWorkflowStore((s) => s.edges);
+  const validationIssues = useWorkflowStore((s) => s.validationIssues);
 
   const onNodesChange = useWorkflowStore((s) => s.onNodesChange);
   const onEdgesChange = useWorkflowStore((s) => s.onEdgesChange);
@@ -105,6 +106,12 @@ export default function WorkflowCanvas() {
   }, [nodes]);
 
   const decoratedEdges = useMemo(() => {
+    const edgeErrorIds = new Set(
+      validationIssues
+        .filter((i) => i.target === "edge" && !!i.id)
+        .map((i) => i.id!)
+    );
+
     return edges.map((e) => {
       let stroke = "rgb(113, 113, 122)"; // default gray
 
@@ -123,20 +130,22 @@ export default function WorkflowCanvas() {
         stroke = EDGE_COLOR_BY_TYPE[sourceNode.type] ?? "rgb(113, 113, 122)";
       }
 
+      const hasError = edgeErrorIds.has(e.id);
+
       return {
         ...e,
         style: {
           ...(e.style ?? {}),
-          stroke,
-          strokeWidth: 2,
+          stroke: hasError ? "rgb(239, 68, 68)" : stroke,
+          strokeWidth: hasError ? 3 : 2,
         },
         markerEnd: {
           type: MarkerType.ArrowClosed,
-          color: stroke,
+          color: hasError ? "rgb(239, 68, 68)" : stroke,
         },
       };
     });
-  }, [edges, nodesById]);
+  }, [edges, nodesById, validationIssues]);
 
   return (
     <div

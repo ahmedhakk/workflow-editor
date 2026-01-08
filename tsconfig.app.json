@@ -48,7 +48,10 @@
       "@types/*": ["src/types/*"],
 
       "@assets": ["src/assets/index.ts"],
-      "@assets/*": ["src/assets/*"]
+      "@assets/*": ["src/assets/*"],
+
+      "@hooks": ["src/hooks/index.ts"],
+      "@hooks/*": ["src/hooks/*"]
     }
   },
   "include": ["src"]

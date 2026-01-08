@@ -1,21 +1,30 @@
 import type { NodeProps } from "reactflow";
-import { Clock } from "lucide-react";
 import BaseNode from "./BaseNode";
+import { useWorkflowStore } from "@features/workflow/workflow.store";
+import { WORKFLOW_NODE_REGISTRY } from "@features/workflow/workflow.registry";
+import { useTranslation } from "react-i18next";
 
-export default function DelayNode({ data, selected }: NodeProps<any>) {
+export default function DelayNode({ data, selected, id }: NodeProps<any>) {
+  const { t } = useTranslation();
   const minutes = data?.config?.minutes;
   const subtitle =
     typeof minutes === "number"
       ? `Wait: ${minutes} minute(s)`
       : "Delay not set";
+  const registry = WORKFLOW_NODE_REGISTRY.delay;
+
+  const hasError = useWorkflowStore((s) =>
+    s.validationIssues.some((i) => i.target === "node" && i.id === id)
+  );
 
   return (
     <BaseNode
-      title={data?.label ?? "Delay"}
+      title={data?.label ?? t(registry.labelKey)}
       subtitle={subtitle}
-      icon={<Clock className="h-4 w-4" />}
+      icon={registry.icon}
       selected={selected}
-      variant="gray"
+      hasError={hasError}
+      variant={registry.variant}
     />
   );
 }

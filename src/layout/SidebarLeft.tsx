@@ -1,45 +1,15 @@
 import type React from "react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   WORKFLOW_NODE_REGISTRY,
   type WorkflowNodeType,
 } from "@features/workflow";
 import HoverTip from "@components/ui/HoverTip";
 import { Layers, Zap, Boxes, GitBranch } from "lucide-react";
+import { useLanguage } from "@hooks";
 
 type CategoryKey = "triggers" | "actions" | "conditions";
-
-const CATEGORIES: Array<{
-  key: CategoryKey;
-  title: string;
-  icon?: React.ReactNode;
-  titleClass: string;
-
-  items: WorkflowNodeType[];
-}> = [
-  {
-    key: "triggers",
-    title: "TRIGGERS",
-    items: ["trigger"], // later: add "scheduleTrigger", "manualTrigger" if you split them
-    // For now, trigger is one node. If later you want “Webhook / Schedule / Manual Trigger” as separate nodes, we’ll add 3 trigger node types.
-    icon: <Zap className="h-4 w-4" />,
-    titleClass: "text-purple-400",
-  },
-  {
-    key: "actions",
-    title: "ACTIONS",
-    icon: <Boxes className="h-4 w-4" />,
-    titleClass: "text-sky-300",
-    items: ["audience", "sms", "whatsapp", "notification", "delay"],
-  },
-  {
-    key: "conditions",
-    title: "CONDITIONS",
-    icon: <GitBranch className="h-4 w-4" />,
-    titleClass: "text-emerald-300",
-    items: ["condition"],
-  },
-];
 
 const VARIANT_TO_STYLE = {
   purple: {
@@ -102,6 +72,38 @@ const VARIANT_TO_STYLE = {
 
 export default function SidebarLeft() {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const { isArabic, dir } = useLanguage();
+  const { t } = useTranslation();
+
+  const CATEGORIES: Array<{
+    key: CategoryKey;
+    titleKey: string;
+    icon?: React.ReactNode;
+    titleClass: string;
+    items: WorkflowNodeType[];
+  }> = [
+    {
+      key: "triggers",
+      titleKey: "canvas.categories.triggers",
+      items: ["trigger"],
+      icon: <Zap className="h-4 w-4" />,
+      titleClass: "text-purple-400",
+    },
+    {
+      key: "actions",
+      titleKey: "canvas.categories.actions",
+      icon: <Boxes className="h-4 w-4" />,
+      titleClass: "text-sky-300",
+      items: ["audience", "sms", "whatsapp", "notification", "delay"],
+    },
+    {
+      key: "conditions",
+      titleKey: "canvas.categories.conditions",
+      icon: <GitBranch className="h-4 w-4" />,
+      titleClass: "text-emerald-300",
+      items: ["condition"],
+    },
+  ];
 
   const onDragStart = (event: React.DragEvent, nodeType: string) => {
     event.dataTransfer.setData("application/reactflow", nodeType);
@@ -115,8 +117,10 @@ export default function SidebarLeft() {
       {/* Toggle Button */}
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute -right-3 top-1/2 z-10 flex h-6 w-6 items-center justify-center rounded-full border border-ui-border bg-ui-card text-ui-muted shadow-lg hover:bg-ui-hover hover:text-ui-text"
-        title={isCollapsed ? "Expand Nodes" : "Collapse Nodes"}
+        className={`absolute ${dir === "rtl" ? "-left-3.5" : "-right-3"} top-1/2 z-10 flex h-6 w-6 items-center justify-center rounded-full border border-ui-border bg-ui-card text-ui-muted shadow-lg hover:bg-ui-hover hover:text-ui-text`}
+        title={
+          isCollapsed ? t("canvas.expandNodes") : t("canvas.collapseNodes")
+        }
       >
         <svg
           className="h-3 w-3"
@@ -125,6 +129,22 @@ export default function SidebarLeft() {
           viewBox="0 0 24 24"
         >
           {isCollapsed ? (
+            isArabic ? (
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            ) : (
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            )
+          ) : isArabic ? (
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -149,10 +169,10 @@ export default function SidebarLeft() {
         <div className="mb-3 pb-3 px-1 border-b border-ui-muted">
           <div className="flex items-center gap-2 text-lg font-semibold text-ui-text">
             <Layers className="h-4 w-4 text-purple-400" />
-            Nodes
+            {t("canvas.nodes")}
           </div>
           <div className="mt-1 text-xs text-ui-muted">
-            Drag nodes to the canvas
+            {t("canvas.dragNodesToCanvas")}
           </div>
         </div>
 
@@ -167,7 +187,7 @@ export default function SidebarLeft() {
                   ].join(" ")}
                 >
                   {cat.icon}
-                  {cat.title}
+                  {t(cat.titleKey)}
                 </div>
 
                 <div className="space-y-2">
@@ -176,9 +196,8 @@ export default function SidebarLeft() {
                     const s = VARIANT_TO_STYLE[r.variant];
 
                     return (
-                      <HoverTip content={r.tooltip}>
+                      <HoverTip key={type} content={t(r.tooltipKey)}>
                         <div
-                          key={type}
                           draggable
                           onDragStart={(e) => onDragStart(e, type)}
                           className={[
@@ -203,11 +222,11 @@ export default function SidebarLeft() {
 
                             <div className="flex-1 min-w-0">
                               <div className="font-semibold text-ui-text truncate">
-                                {r.label}
+                                {t(r.labelKey)}
                               </div>
 
                               <div className="mt-0.5 text-xs text-ui-muted truncate">
-                                {r.tooltip}
+                                {t(r.tooltipKey)}
                               </div>
                             </div>
                           </div>

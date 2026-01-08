@@ -29,52 +29,52 @@ export type NodeVariant =
 export const WORKFLOW_NODE_REGISTRY: Record<
   WorkflowNodeType,
   {
-    label: string;
+    labelKey: string;
+    tooltipKey: string;
     variant: NodeVariant;
     icon: React.ReactNode;
-    tooltip: string;
   }
 > = {
   trigger: {
-    label: "Trigger",
+    labelKey: "nodeLabels.trigger",
+    tooltipKey: "nodeTooltips.trigger",
     variant: "purple",
     icon: <Zap className="h-4 w-4" />,
-    tooltip: "Starts the workflow (Webhook / Schedule / Manual).",
   },
   audience: {
-    label: "Audience",
+    labelKey: "nodeLabels.audience",
+    tooltipKey: "nodeTooltips.audience",
     variant: "blue",
     icon: <Users className="h-4 w-4" />,
-    tooltip: "Choose who will receive messages.",
   },
   whatsapp: {
-    label: "Send WhatsApp",
+    labelKey: "nodeLabels.whatsapp",
+    tooltipKey: "nodeTooltips.whatsapp",
     variant: "green",
     icon: <MessageCircle className="h-4 w-4" />,
-    tooltip: "Send a WhatsApp template message.",
   },
   sms: {
-    label: "Send SMS",
+    labelKey: "nodeLabels.sms",
+    tooltipKey: "nodeTooltips.sms",
     variant: "orange",
     icon: <MessageSquareText className="h-4 w-4" />,
-    tooltip: "Send an SMS message.",
   },
   delay: {
-    label: "Delay",
+    labelKey: "nodeLabels.delay",
+    tooltipKey: "nodeTooltips.delay",
     variant: "gray",
     icon: <Clock className="h-4 w-4" />,
-    tooltip: "Wait before running the next step.",
   },
   condition: {
-    label: "IF / ELSE",
+    labelKey: "nodeLabels.condition",
+    tooltipKey: "nodeTooltips.condition",
     variant: "red",
     icon: <GitBranch className="h-4 w-4" />,
-    tooltip: "Branch the workflow based on a rule.",
   },
   notification: {
-    label: "Send Notification",
+    labelKey: "nodeLabels.notification",
+    tooltipKey: "nodeTooltips.notification",
     variant: "yellow",
     icon: <Bell className="h-4 w-4" />,
-    tooltip: "Send an in-app notification.",
   },
 };

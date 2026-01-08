@@ -9,9 +9,14 @@ import {
   type NodeChange,
 } from "reactflow";
 import type { WorkflowEdge, WorkflowNode, WorkflowNodeType } from "@types";
-import { validateConnection } from "@features/workflow/workflow.rules";
+import {
+  validateConnection,
+  validateWorkflow,
+  type ValidationIssue,
+} from "@features/workflow/workflow.rules";
 import { serializeWorkflow } from "@features/workflow/workflow.serializer";
 import { useToastStore } from "@/components/ui/toast/toast.store";
+import i18n from "@/i18n";
 
 type WorkflowState = {
   nodes: WorkflowNode[];
@@ -55,6 +60,12 @@ type WorkflowState = {
 
   exportWorkflow: () => import("./workflow.serializer").WorkflowPayload;
 
+  // ✅ Validation
+  validationIssues: ValidationIssue[];
+  clearValidation: () => void;
+  revalidateSoon: () => void;
+  validateWorkflowNow: () => { valid: boolean; issues: ValidationIssue[] };
+
   // Reset/load
   load: (payload: { nodes: WorkflowNode[]; edges: WorkflowEdge[] }) => void;
 };
@@ -89,6 +100,15 @@ function makeId(type: WorkflowNodeType) {
   return `${type}-${crypto.randomUUID().slice(0, 8)}`;
 }
 
+let revalidateTimer: number | null = null;
+function scheduleRevalidate(fn: () => void, delay = 250) {
+  if (revalidateTimer) window.clearTimeout(revalidateTimer);
+  revalidateTimer = window.setTimeout(() => {
+    revalidateTimer = null;
+    fn();
+  }, delay);
+}
+
 export const useWorkflowStore = create<WorkflowState>((set, get) => ({
   nodes: initialNodes,
   edges: initialEdges,
@@ -98,6 +118,23 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
   workflowId: "wf-local-1",
   workflowName: "My Workflow",
   workflowStatus: "draft",
+
+  // ✅ validation state
+  validationIssues: [],
+  clearValidation: () => set({ validationIssues: [] }),
+  revalidateSoon: () => {
+    scheduleRevalidate(() => {
+      const { nodes, edges } = get();
+      const res = validateWorkflow({ nodes, edges });
+      set({ validationIssues: res.issues });
+    }, 250);
+  },
+  validateWorkflowNow: () => {
+    const { nodes, edges } = get();
+    const res = validateWorkflow({ nodes, edges });
+    set({ validationIssues: res.issues });
+    return res;
+  },
 
   onNodesChange: (changes) =>
     set((state) => ({
@@ -111,7 +148,6 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
 
   onConnect: (connection) =>
     set((state) => {
-      console.log("CONNECT", connection);
       const result = validateConnection({
         connection,
         nodes: state.nodes,
@@ -119,24 +155,27 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
       });
 
       if (!result.valid) {
-        if (result.reason) {
-          useToastStore.getState().error(result.reason);
+        if (result.reasonKey) {
+          const message = i18n.t(result.reasonKey, result.reasonParams);
+          useToastStore.getState().error(message);
         }
         return state;
       }
 
-      return {
-        edges: addEdge(
-          {
-            ...connection,
-            id: `e-${crypto.randomUUID().slice(0, 8)}`,
-            markerEnd: { type: MarkerType.ArrowClosed },
-            style: { strokeWidth: 2 },
-            labelStyle: { fontSize: 12 },
-          },
-          state.edges
-        ),
-      };
+      const nextEdges = addEdge(
+        {
+          ...connection,
+          id: `e-${crypto.randomUUID().slice(0, 8)}`,
+          markerEnd: { type: MarkerType.ArrowClosed },
+          style: { strokeWidth: 2 },
+        },
+        state.edges
+      );
+
+      // ✅ trigger revalidation after state updates
+      queueMicrotask(() => get().revalidateSoon());
+
+      return { edges: nextEdges };
     }),
 
   selectNode: (id) => set({ selectedNodeId: id, selectedEdgeId: null }),
@@ -177,6 +216,9 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
     };
 
     set((state) => ({ nodes: [...state.nodes, newNode] }));
+
+    // re-validate on edits
+    get().revalidateSoon();
   },
 
   updateNodeData: (id, partial) => {
@@ -185,6 +227,9 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
         n.id === id ? { ...n, data: { ...n.data, ...partial } } : n
       ),
     }));
+
+    // re-validate on edits
+    get().revalidateSoon();
   },
 
   addNodeAtPosition: (type, position) => {
@@ -197,6 +242,9 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
         return;
       }
     }
+
+    // re-validate on edits
+    get().revalidateSoon();
 
     const id = `${type}-${crypto.randomUUID().slice(0, 8)}`;
 
@@ -224,9 +272,14 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
         },
       ],
     }));
+
+    // re-validate on edits
+    get().revalidateSoon();
   },
 
   deleteEdgeById: (id) => {
+    get().revalidateSoon();
+
     set((state) => ({
       edges: state.edges.filter((e) => e.id !== id),
       selectedEdgeId: state.selectedEdgeId === id ? null : state.selectedEdgeId,
@@ -239,19 +292,22 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
       edges: state.edges.filter((e) => e.source !== id && e.target !== id),
       selectedNodeId: state.selectedNodeId === id ? null : state.selectedNodeId,
     }));
+
+    get().revalidateSoon();
   },
 
   deleteSelected: () => {
     const { selectedNodeId, selectedEdgeId } = get();
     if (selectedNodeId) get().deleteNodeById(selectedNodeId);
     else if (selectedEdgeId) get().deleteEdgeById(selectedEdgeId);
+
+    get().revalidateSoon();
   },
 
   setWorkflowName: (name) => set({ workflowName: name }),
 
   exportWorkflow: () => {
     const { workflowId, workflowName, workflowStatus, nodes, edges } = get();
-
     return serializeWorkflow({
       id: workflowId,
       name: workflowName,
@@ -262,5 +318,12 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
     });
   },
 
-  load: ({ nodes, edges }) => set({ nodes, edges, selectedNodeId: null }),
+  load: ({ nodes, edges }) =>
+    set({
+      nodes,
+      edges,
+      selectedNodeId: null,
+      selectedEdgeId: null,
+      validationIssues: [],
+    }),
 }));

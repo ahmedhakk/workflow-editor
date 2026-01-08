@@ -1,5 +1,6 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Plus,
   Search,
@@ -14,15 +15,14 @@ import {
   BookOpen,
   Star,
   Users,
-  Globe,
   User,
-  Bell,
-  LogOut,
   PanelRightOpen,
   PanelRightClose,
+  ArrowLeft,
 } from "lucide-react";
 import { Header } from "@layout";
-import ToastRenderer from "@/components/ui/toast/ToastRenderer";
+import ToastRenderer from "@components/ui/toast/ToastRenderer";
+import UserMenu from "@components/ui/UserMenu";
 
 import {
   createWorkflowSeed,
@@ -34,16 +34,12 @@ import {
   type WorkflowListItem,
 } from "@/services/workflows.local";
 import { useToastStore } from "@/components/ui/toast/toast.store";
+import { useLanguage } from "@hooks";
 
 type TabKey = "overview" | "settings" | "activity";
 
-function loadIndexSeedIfEmpty(): WorkflowListItem[] {
-  let existing = listWorkflows();
-  if (existing.length === 0) {
-    createWorkflowSeed({ name: "Welcome workflow" });
-    existing = listWorkflows();
-  }
-  return existing;
+function loadWorkflowList(): WorkflowListItem[] {
+  return listWorkflows();
 }
 
 type PageState = {
@@ -61,19 +57,23 @@ type NavItem = {
 
 export default function WorkflowsPage() {
   const nav = useNavigate();
+  const { t } = useTranslation();
+  const { isArabic } = useLanguage();
   const showToast = useToastStore((s) => s.success);
+
+  useEffect(() => {
+    document.title = t("workflows.title");
+  }, [t]);
 
   // Left sidebar state
   const [leftCollapsed, setLeftCollapsed] = useState(false);
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [languageEnabled, setLanguageEnabled] = useState(true); // placeholder
 
   // Right sidebar state
   const [rightCollapsed, setRightCollapsed] = useState(false);
 
-  // Initialize both items + selectedId ONCE (no effects, no double seeding)
+  // Initialize both items + selectedId ONCE
   const [{ items, selectedId }, setPageState] = useState<PageState>(() => {
-    const initial = loadIndexSeedIfEmpty();
+    const initial = loadWorkflowList();
     return {
       items: initial,
       selectedId: initial[0]?.id ?? null,
@@ -127,34 +127,34 @@ export default function WorkflowsPage() {
   const navItems: NavItem[] = [
     {
       key: "workflows",
-      label: "Workflows",
+      label: t("workflows.title"),
       icon: Workflow,
       active: true,
       onClick: () => nav("/workflows"),
     },
     {
       key: "projects",
-      label: "All projects",
+      label: t("sidebar.allProjects"),
       icon: LayoutGrid,
-      onClick: () => showToast("All projects (later)"),
+      onClick: () => showToast(t("toasts.allProjectsLater")),
     },
     {
       key: "starred",
-      label: "Starred",
+      label: t("sidebar.starred"),
       icon: Star,
-      onClick: () => showToast("Starred (later)"),
+      onClick: () => showToast(t("toasts.starredLater")),
     },
     {
       key: "shared",
-      label: "Shared with me",
+      label: t("sidebar.sharedWithMe"),
       icon: Users,
-      onClick: () => showToast("Shared with me (later)"),
+      onClick: () => showToast(t("toasts.sharedLater")),
     },
     {
       key: "learn",
-      label: "Learn",
+      label: t("sidebar.learn"),
       icon: BookOpen,
-      onClick: () => showToast("Learn (later)"),
+      onClick: () => showToast(t("toasts.learnLater")),
     },
   ];
 
@@ -162,15 +162,15 @@ export default function WorkflowsPage() {
     <div className="h-screen w-screen bg-ui-canvas text-ui-text overflow-hidden">
       {/* Top bar */}
       <Header
-        title="Workflows"
-        subtitle="Projects"
+        title={t("workflows.title")}
+        subtitle={t("header.projects")}
         rightActions={
           <button
             onClick={onCreate}
             className="inline-flex items-center gap-2 rounded-md bg-zinc-100 px-3 py-1.5 text-sm font-medium text-zinc-900 hover:bg-white cursor-pointer"
           >
             <Plus className="h-4 w-4" />
-            Create workflow
+            {t("workflows.createWorkflow")}
           </button>
         }
       />
@@ -196,10 +196,10 @@ export default function WorkflowsPage() {
 
                     <div className="min-w-0">
                       <div className="text-sm font-semibold truncate">
-                        Dreams Workspace
+                        {t("sidebar.dreamsWorkspace")}
                       </div>
                       <div className="text-xs text-ui-muted truncate">
-                        All projects
+                        {t("sidebar.allProjects")}
                       </div>
                     </div>
                   </>
@@ -208,13 +208,18 @@ export default function WorkflowsPage() {
 
               <button
                 onClick={() => {
-                  setUserMenuOpen(false);
                   setLeftCollapsed((v) => !v);
                 }}
                 className="h-9 w-9 rounded-md border border-ui-border bg-ui-card hover:bg-ui-hover flex items-center justify-center cursor-pointer group"
                 aria-label="Toggle sidebar"
               >
                 {leftCollapsed ? (
+                  isArabic ? (
+                    <ChevronsLeft className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-px" />
+                  ) : (
+                    <ChevronsRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-px" />
+                  )
+                ) : isArabic ? (
                   <ChevronsRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-px" />
                 ) : (
                   <ChevronsLeft className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-px" />
@@ -251,130 +256,42 @@ export default function WorkflowsPage() {
 
             {/* Bottom user section */}
             <div className="p-2 border-t border-ui-border shrink-0">
-              <div className="relative">
-                <button
-                  onClick={() => setUserMenuOpen((v) => !v)}
-                  className={[
-                    "w-full flex items-center gap-3 rounded-md border border-ui-border bg-ui-card hover:bg-ui-hover cursor-pointer",
-                    leftCollapsed ? "justify-center px-0 py-2" : "px-3 py-2",
-                  ].join(" ")}
-                >
-                  <div className="h-8 w-8 rounded-full bg-white/10 border border-ui-border flex items-center justify-center shrink-0">
-                    <User className="h-4 w-4" />
+              <UserMenu
+                position="sidebar"
+                trigger={
+                  <div
+                    className={[
+                      "w-full flex items-center gap-3 rounded-md border border-ui-border bg-ui-card hover:bg-ui-hover",
+                      leftCollapsed ? "justify-center px-2 py-2" : "px-3 py-2",
+                    ].join(" ")}
+                  >
+                    <div className="h-8 w-8 rounded-full bg-white/10 border border-ui-border flex items-center justify-center shrink-0">
+                      <User className="h-4 w-4" />
+                    </div>
+
+                    {!leftCollapsed && (
+                      <div className="flex-1 min-w-0 overflow-hidden text-left">
+                        <div className="text-sm font-medium truncate">
+                          Ahmed
+                        </div>
+                        <div className="text-xs text-ui-muted truncate">
+                          ahmed@example.com
+                        </div>
+                      </div>
+                    )}
+
+                    {!leftCollapsed && (
+                      <div className="shrink-0 h-7 w-7 rounded-md hover:bg-ui-hover flex items-center justify-center">
+                        {isArabic ? (
+                          <ChevronsLeft className="h-4 w-4" />
+                        ) : (
+                          <ChevronsRight className="h-4 w-4" />
+                        )}
+                      </div>
+                    )}
                   </div>
-
-                  {!leftCollapsed && (
-                    <div className="flex-1 min-w-0 overflow-hidden text-left">
-                      <div className="text-sm font-medium truncate">Ahmed</div>
-                      <div className="text-xs text-ui-muted truncate">
-                        ahmed@example.com
-                      </div>
-                    </div>
-                  )}
-
-                  {!leftCollapsed && (
-                    <div className="shrink-0 h-7 w-7 rounded-md hover:bg-ui-hover flex items-center justify-center">
-                      <ChevronsRight
-                        className={[
-                          "h-4 w-4 transition-transform",
-                          userMenuOpen ? "rotate-90" : "",
-                        ].join(" ")}
-                      />
-                    </div>
-                  )}
-                </button>
-
-                {/* User popover */}
-                {userMenuOpen && (
-                  <div className="absolute bottom-12 left-2 z-50 w-70 rounded-xl border border-ui-border bg-ui-panel shadow-xl">
-                    <div className="p-3 border-b border-ui-border">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-full bg-white/10 border border-ui-border flex items-center justify-center">
-                          <span className="text-sm font-semibold">AH</span>
-                        </div>
-                        <div className="min-w-0">
-                          <div className="text-sm font-semibold truncate">
-                            ahmed
-                          </div>
-                          <div className="text-xs text-ui-muted truncate">
-                            ahmed@example.com
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="p-2">
-                      <button
-                        onClick={() => showToast("Profile (later)")}
-                        className="w-full flex items-center gap-3 rounded-md px-3 py-2 text-sm hover:bg-ui-hover cursor-pointer"
-                      >
-                        <User className="h-4 w-4" />
-                        Profile
-                      </button>
-
-                      <button
-                        onClick={() => showToast("Change password (later)")}
-                        className="w-full flex items-center gap-3 rounded-md px-3 py-2 text-sm hover:bg-ui-hover cursor-pointer"
-                      >
-                        <Settings className="h-4 w-4" />
-                        Change password
-                      </button>
-
-                      <button
-                        onClick={() => showToast("Notify me (later)")}
-                        className="w-full flex items-center gap-3 rounded-md px-3 py-2 text-sm hover:bg-ui-hover cursor-pointer"
-                      >
-                        <Bell className="h-4 w-4" />
-                        Notify me
-                      </button>
-
-                      <div className="my-2 border-t border-ui-border" />
-
-                      <div className="px-3 py-2 flex items-center justify-between">
-                        <div className="flex items-center gap-2 text-sm">
-                          <Globe className="h-4 w-4 text-ui-muted" />
-                          English
-                        </div>
-
-                        <button
-                          onClick={() => setLanguageEnabled((v) => !v)}
-                          className={[
-                            "h-6 w-10 rounded-full border border-ui-border transition relative",
-                            languageEnabled
-                              ? "bg-emerald-500/30"
-                              : "bg-ui-card",
-                          ].join(" ")}
-                        >
-                          <span
-                            className={[
-                              "absolute top-1/2 -translate-y-1/2 h-4 w-4 rounded-full bg-white/80 transition",
-                              languageEnabled ? "left-5" : "left-1",
-                            ].join(" ")}
-                          />
-                        </button>
-                      </div>
-
-                      <div className="my-2 border-t border-ui-border" />
-
-                      <button
-                        onClick={() => showToast("Logout (later)")}
-                        className="w-full flex items-center gap-3 rounded-md px-3 py-2 text-sm text-red-300 hover:bg-red-500/10 cursor-pointer"
-                      >
-                        <LogOut className="h-4 w-4" />
-                        Log out
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {userMenuOpen && (
-                <button
-                  onClick={() => setUserMenuOpen(false)}
-                  className="fixed inset-0 z-40 cursor-default"
-                  aria-label="Close user menu overlay"
-                />
-              )}
+                }
+              />
             </div>
           </div>
         </aside>
@@ -386,12 +303,12 @@ export default function WorkflowsPage() {
             <div className="mx-auto w-full max-w-300">
               <div className="flex items-center gap-3">
                 <div className="relative w-full max-w-md">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ui-muted" />
+                  <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ui-muted" />
                   <input
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search workflows..."
-                    className="w-full rounded-md border border-ui-border bg-ui-card pl-9 pr-3 py-2 text-sm outline-none focus:ring-2 focus:ring-white/10"
+                    placeholder={t("workflows.searchWorkflows")}
+                    className="w-full rounded-md border border-ui-border bg-ui-card ps-9 pe-3 py-2 text-sm outline-none focus:ring-2 focus:ring-white/10"
                   />
                 </div>
               </div>
@@ -413,10 +330,10 @@ export default function WorkflowsPage() {
                         <Plus className="h-5 w-5" />
                       </div>
                       <div className="text-sm font-medium">
-                        Create new workflow
+                        {t("workflows.createNewWorkflow")}
                       </div>
                       <div className="text-xs text-ui-muted">
-                        Draft in localStorage for now
+                        {t("workflows.draftInLocalStorage")}
                       </div>
                     </div>
                   </div>
@@ -436,6 +353,7 @@ export default function WorkflowsPage() {
                   >
                     <div className="absolute inset-0 bg-linear-to-br from-white/5 to-white/0" />
 
+                    {/* Status badge */}
                     <div className="absolute top-3 left-3">
                       <span
                         className={[
@@ -462,7 +380,12 @@ export default function WorkflowsPage() {
                           v{w.version}
                         </div>
                         <div className="text-[11px] text-ui-muted group-hover:text-ui-text flex items-center gap-1">
-                          Open <ArrowRight className="h-3 w-3" />
+                          {t("common.open")}
+                          {isArabic ? (
+                            <ArrowLeft className="h-3 w-3" />
+                          ) : (
+                            <ArrowRight className="h-3 w-3" />
+                          )}
                         </div>
                       </div>
                     </div>
@@ -485,9 +408,11 @@ export default function WorkflowsPage() {
           <div className="h-14 px-3 flex items-center justify-between border-b border-ui-border">
             {!rightCollapsed && (
               <div>
-                <div className="text-sm font-semibold">Details</div>
+                <div className="text-sm font-semibold">
+                  {t("workflows.details")}
+                </div>
                 <div className="text-xs text-ui-muted">
-                  Select a workflow from the grid
+                  {t("workflows.selectFromGrid")}
                 </div>
               </div>
             )}
@@ -499,6 +424,12 @@ export default function WorkflowsPage() {
               title={rightCollapsed ? "Open details" : "Collapse details"}
             >
               {rightCollapsed ? (
+                isArabic ? (
+                  <PanelRightClose className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-px" />
+                ) : (
+                  <PanelRightOpen className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-px" />
+                )
+              ) : isArabic ? (
                 <PanelRightOpen className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-px" />
               ) : (
                 <PanelRightClose className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-px" />
@@ -511,7 +442,7 @@ export default function WorkflowsPage() {
             <div className="overflow-auto h-[calc(100vh-56px-56px)]">
               {!selected ? (
                 <div className="p-4 text-sm text-ui-muted">
-                  No workflow selected.
+                  {t("workflows.noWorkflowSelected")}
                 </div>
               ) : (
                 <div className="p-4">
@@ -539,9 +470,14 @@ export default function WorkflowsPage() {
 
                     <button
                       onClick={() => onOpen(selected.id)}
-                      className="shrink-0 inline-flex items-center gap-2 rounded-md border border-ui-border bg-ui-card px-3 py-1.5 text-sm hover:bg-ui-hover"
+                      className="shrink-0 inline-flex items-center gap-2 rounded-md border border-ui-border cursor-pointer bg-ui-card px-3 py-1.5 text-sm hover:bg-ui-hover"
                     >
-                      Open <ArrowRight className="h-4 w-4" />
+                      {t("common.open")}
+                      {isArabic ? (
+                        <ArrowLeft className="h-4 w-4" />
+                      ) : (
+                        <ArrowRight className="h-4 w-4" />
+                      )}
                     </button>
                   </div>
 
@@ -549,10 +485,10 @@ export default function WorkflowsPage() {
                   <div className="mt-4 flex gap-2 border-b border-ui-border pb-3">
                     {(
                       [
-                        ["overview", "Overview"],
-                        ["settings", "Settings"],
-                        ["activity", "Activity"],
-                      ] as const
+                        ["overview", t("workflows.overview")],
+                        ["settings", t("common.settings")],
+                        ["activity", t("workflows.activity")],
+                      ] as [TabKey, string][]
                     ).map(([k, label]) => (
                       <button
                         key={k}
@@ -573,7 +509,9 @@ export default function WorkflowsPage() {
                   {tab === "overview" && (
                     <div className="mt-4 space-y-3">
                       <div className="rounded-lg border border-ui-border bg-ui-card p-3">
-                        <div className="text-xs text-ui-muted">Workflow ID</div>
+                        <div className="text-xs text-ui-muted">
+                          {t("workflows.workflowId")}
+                        </div>
                         <div className="mt-1 font-mono text-xs">
                           {selected.id}
                         </div>
@@ -585,20 +523,20 @@ export default function WorkflowsPage() {
                             duplicateWorkflow(selected.id);
                             refresh();
                           }}
-                          className="flex-1 inline-flex items-center justify-center gap-2 rounded-md border border-ui-border bg-ui-card px-3 py-2 text-sm hover:bg-ui-hover"
+                          className="flex-1 inline-flex items-center justify-center gap-2 rounded-md border cursor-pointer border-ui-border bg-ui-card px-3 py-2 text-sm hover:bg-ui-hover"
                         >
                           <Copy className="h-4 w-4" />
-                          Duplicate
+                          {t("common.duplicate")}
                         </button>
                         <button
                           onClick={() => {
                             deleteWorkflow(selected.id);
                             refresh();
                           }}
-                          className="inline-flex items-center justify-center gap-2 rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-200 hover:bg-red-500/15"
+                          className="inline-flex items-center justify-center gap-2 rounded-md border cursor-pointer border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-200 hover:bg-red-500/15"
                         >
                           <Trash2 className="h-4 w-4" />
-                          Delete
+                          {t("common.delete")}
                         </button>
                       </div>
                     </div>
@@ -609,11 +547,13 @@ export default function WorkflowsPage() {
                       <div className="rounded-lg border border-ui-border bg-ui-card p-3">
                         <div className="flex items-center gap-2 text-sm font-medium">
                           <Settings className="h-4 w-4" />
-                          Settings
+                          {t("common.settings")}
                         </div>
 
                         <div className="mt-3 space-y-2">
-                          <label className="text-xs text-ui-muted">Name</label>
+                          <label className="text-xs text-ui-muted">
+                            {t("common.name")}
+                          </label>
                           <input
                             defaultValue={selected.name}
                             onBlur={(e) => {
@@ -626,7 +566,7 @@ export default function WorkflowsPage() {
                           />
 
                           <label className="mt-2 block text-xs text-ui-muted">
-                            Status
+                            {t("common.status")}
                           </label>
                           <div className="flex gap-2">
                             <button
@@ -641,7 +581,7 @@ export default function WorkflowsPage() {
                                   : "border-ui-border hover:bg-ui-hover",
                               ].join(" ")}
                             >
-                              Draft
+                              {t("common.draft")}
                             </button>
                             <button
                               onClick={() => {
@@ -655,24 +595,25 @@ export default function WorkflowsPage() {
                                   : "border-ui-border hover:bg-ui-hover",
                               ].join(" ")}
                             >
-                              Published
+                              {t("common.published")}
                             </button>
                           </div>
                         </div>
                       </div>
 
                       <div className="text-xs text-ui-muted">
-                        Later we can add: visibility, tags, owner, folder, etc.
+                        {t("workflows.settingsNote")}
                       </div>
                     </div>
                   )}
 
                   {tab === "activity" && (
                     <div className="mt-4 rounded-lg border border-ui-border bg-ui-card p-3">
-                      <div className="text-sm font-medium">Activity</div>
+                      <div className="text-sm font-medium">
+                        {t("workflows.activity")}
+                      </div>
                       <div className="mt-1 text-sm text-ui-muted">
-                        No activity yet. (We’ll fill this when backend + run
-                        history exist.)
+                        {t("workflows.noActivity")}
                       </div>
                     </div>
                   )}

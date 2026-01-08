@@ -1,18 +1,27 @@
 import type { NodeProps } from "reactflow";
-import { MessageCircle } from "lucide-react";
 import BaseNode from "./BaseNode";
+import { useWorkflowStore } from "@features/workflow/workflow.store";
+import { WORKFLOW_NODE_REGISTRY } from "@features/workflow/workflow.registry";
+import { useTranslation } from "react-i18next";
 
-export default function WhatsAppNode({ data, selected }: NodeProps<any>) {
+export default function WhatsAppNode({ data, selected, id }: NodeProps<any>) {
+  const { t } = useTranslation();
   const templateId = data?.config?.templateId;
   const subtitle = templateId ? `Template: ${templateId}` : "Template not set";
+  const registry = WORKFLOW_NODE_REGISTRY.whatsapp;
+
+  const hasError = useWorkflowStore((s) =>
+    s.validationIssues.some((i) => i.target === "node" && i.id === id)
+  );
 
   return (
     <BaseNode
-      title={data?.label ?? "Send WhatsApp"}
+      title={data?.label ?? t(registry.labelKey)}
       subtitle={subtitle}
-      icon={<MessageCircle className="h-4 w-4" />}
+      icon={registry.icon}
       selected={selected}
-      variant="green"
+      hasError={hasError}
+      variant={registry.variant}
     />
   );
 }

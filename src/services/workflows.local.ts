@@ -1,4 +1,5 @@
 import type { WorkflowPayload } from "@features/workflow/workflow.serializer";
+import { buildWorkflowExecution } from "@features/workflow/workflow.executor";
 
 export type WorkflowListItem = {
   id: string;
@@ -31,7 +32,7 @@ export function listWorkflows(): WorkflowListItem[] {
   );
 
   // newest first
-  return index.sort(
+  return [...index].sort(
     (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
   );
 }
@@ -60,7 +61,6 @@ export function upsertWorkflow(payload: WorkflowPayload) {
   };
 
   const next = [item, ...index.filter((x) => x.id !== payload.id)];
-
   localStorage.setItem(LS_INDEX_KEY, JSON.stringify(next));
 }
 
@@ -79,27 +79,40 @@ export function deleteWorkflow(id: string) {
 
 export function createWorkflowSeed(args?: { name?: string }) {
   const id = `wf-${crypto.randomUUID().slice(0, 8)}`;
+
+  const nodes: WorkflowPayload["nodes"] = [
+    {
+      id: "trigger-1",
+      type: "trigger",
+      position: { x: 120, y: 80 },
+      data: { label: "Trigger", config: {} },
+    },
+    {
+      id: "audience-1",
+      type: "audience",
+      position: { x: 120, y: 220 },
+      data: { label: "Audience", config: {} },
+    },
+  ];
+
+  const edges: WorkflowPayload["edges"] = [
+    { id: "e1-2", source: "trigger-1", target: "audience-1" },
+  ];
+
+  const execution = buildWorkflowExecution({
+    nodes: nodes as any,
+    edges: edges as any,
+  });
+
   const payload: WorkflowPayload = {
     id,
     name: args?.name ?? "Untitled workflow",
     status: "draft",
     version: 1,
     updatedAt: nowIso(),
-    nodes: [
-      {
-        id: "trigger-1",
-        type: "trigger",
-        position: { x: 120, y: 80 },
-        data: { label: "Trigger", config: {} },
-      },
-      {
-        id: "audience-1",
-        type: "audience",
-        position: { x: 120, y: 220 },
-        data: { label: "Audience", config: {} },
-      },
-    ],
-    edges: [{ id: "e1-2", source: "trigger-1", target: "audience-1" }],
+    execution,
+    nodes,
+    edges,
   };
 
   upsertWorkflow(payload);
@@ -112,17 +125,22 @@ export function duplicateWorkflow(id: string) {
 
   const copy = createWorkflowSeed({ name: `${existing.name} (copy)` });
 
-  // keep the same structure but new ids for nodes/edges
-  // (simple approach: just reuse nodes/edges as-is for now; ReactFlow ids must be unique inside a doc)
+  const nodes = existing.nodes.map((n) => ({ ...n, id: `${n.id}-${copy.id}` }));
+  const edges = existing.edges.map((e) => ({
+    ...e,
+    id: `${e.id}-${copy.id}`,
+    source: `${e.source}-${copy.id}`,
+    target: `${e.target}-${copy.id}`,
+  }));
+
   upsertWorkflow({
     ...copy,
-    nodes: existing.nodes.map((n) => ({ ...n, id: `${n.id}-${copy.id}` })),
-    edges: existing.edges.map((e) => ({
-      ...e,
-      id: `${e.id}-${copy.id}`,
-      source: `${e.source}-${copy.id}`,
-      target: `${e.target}-${copy.id}`,
-    })),
+    execution: buildWorkflowExecution({
+      nodes: nodes as any,
+      edges: edges as any,
+    }),
+    nodes,
+    edges,
   });
 
   return getWorkflow(copy.id);
