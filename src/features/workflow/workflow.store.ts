@@ -67,7 +67,13 @@ type WorkflowState = {
   validateWorkflowNow: () => { valid: boolean; issues: ValidationIssue[] };
 
   // Reset/load
-  load: (payload: { nodes: WorkflowNode[]; edges: WorkflowEdge[] }) => void;
+  load: (payload: {
+    id: string;
+    name: string;
+    status: "draft" | "published";
+    nodes: WorkflowNode[];
+    edges: WorkflowEdge[];
+  }) => void;
 };
 
 const initialNodes: WorkflowNode[] = [
@@ -318,8 +324,11 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
     });
   },
 
-  load: ({ nodes, edges }) =>
+  load: ({ id, name, status, nodes, edges }) =>
     set({
+      workflowId: id,
+      workflowName: name,
+      workflowStatus: status,
       nodes,
       edges,
       selectedNodeId: null,

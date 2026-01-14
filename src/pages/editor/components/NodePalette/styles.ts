@@ -1,0 +1,60 @@
+export type CategoryKey = "triggers" | "actions" | "conditions";
+
+export const VARIANT_TO_STYLE = {
+  purple: {
+    border: "border-purple-500/40",
+    bg: "bg-purple-950/20",
+    hover: "hover:bg-purple-950/30",
+    badge: "bg-purple-500/15",
+    badgeBorder: "border-purple-500/30",
+    text: "text-purple-200",
+  },
+  blue: {
+    border: "border-sky-500/40",
+    bg: "bg-sky-950/20",
+    hover: "hover:bg-sky-950/30",
+    badge: "bg-sky-500/15",
+    badgeBorder: "border-sky-500/30",
+    text: "text-sky-200",
+  },
+  green: {
+    border: "border-emerald-500/40",
+    bg: "bg-emerald-950/20",
+    hover: "hover:bg-emerald-950/30",
+    badge: "bg-emerald-500/15",
+    badgeBorder: "border-emerald-500/30",
+    text: "text-emerald-200",
+  },
+  orange: {
+    border: "border-orange-500/40",
+    bg: "bg-orange-950/20",
+    hover: "hover:bg-orange-950/30",
+    badge: "bg-orange-500/15",
+    badgeBorder: "border-orange-500/30",
+    text: "text-orange-200",
+  },
+  gray: {
+    border: "border-zinc-600/50",
+    bg: "bg-zinc-900/40",
+    hover: "hover:bg-zinc-800/50",
+    badge: "bg-zinc-500/15",
+    badgeBorder: "border-zinc-500/30",
+    text: "text-zinc-200",
+  },
+  yellow: {
+    border: "border-yellow-500/40",
+    bg: "bg-yellow-950/20",
+    hover: "hover:bg-yellow-950/30",
+    badge: "bg-yellow-500/15",
+    badgeBorder: "border-yellow-500/30",
+    text: "text-yellow-200",
+  },
+  red: {
+    border: "border-red-500/40",
+    bg: "bg-red-950/20",
+    hover: "hover:bg-red-950/30",
+    badge: "bg-red-500/15",
+    badgeBorder: "border-red-500/30",
+    text: "text-red-200",
+  },
+} as const;

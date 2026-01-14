@@ -1,5 +1,6 @@
 import type { WorkflowPayload } from "@features/workflow/workflow.serializer";
-import { buildWorkflowExecution } from "@features/workflow/workflow.executor";
+import { safeJsonParse } from "@/helpers";
+// import { buildWorkflowExecution } from "@features/workflow/workflow.executor";
 
 export type WorkflowListItem = {
   id: string;
@@ -14,15 +15,6 @@ const LS_DOC_KEY = (id: string) => `wf:doc:${id}`;
 
 function nowIso() {
   return new Date().toISOString();
-}
-
-function safeJsonParse<T>(value: string | null, fallback: T): T {
-  if (!value) return fallback;
-  try {
-    return JSON.parse(value) as T;
-  } catch {
-    return fallback;
-  }
 }
 
 export function listWorkflows(): WorkflowListItem[] {
@@ -96,13 +88,17 @@ export function createWorkflowSeed(args?: { name?: string }) {
   ];
 
   const edges: WorkflowPayload["edges"] = [
-    { id: "e1-2", source: "trigger-1", target: "audience-1" },
+    {
+      id: "e1-2",
+      source: "trigger-1",
+      target: "audience-1",
+    },
   ];
 
-  const execution = buildWorkflowExecution({
-    nodes: nodes as any,
-    edges: edges as any,
-  });
+  // const execution = buildWorkflowExecution({
+  //   nodes: nodes as any,
+  //   edges: edges as any,
+  // });
 
   const payload: WorkflowPayload = {
     id,
@@ -110,7 +106,7 @@ export function createWorkflowSeed(args?: { name?: string }) {
     status: "draft",
     version: 1,
     updatedAt: nowIso(),
-    execution,
+    // execution,
     nodes,
     edges,
   };
@@ -135,10 +131,10 @@ export function duplicateWorkflow(id: string) {
 
   upsertWorkflow({
     ...copy,
-    execution: buildWorkflowExecution({
-      nodes: nodes as any,
-      edges: edges as any,
-    }),
+    // execution: buildWorkflowExecution({
+    //   nodes: nodes as any,
+    //   edges: edges as any,
+    // }),
     nodes,
     edges,
   });

@@ -29,6 +29,9 @@
       "@/*": ["src/*"],
       "@app/*": ["src/app/*"],
 
+      "@pages": ["src/pages/index.ts"],
+      "@pages/*": ["src/pages/*"],
+
       "@features": ["src/features/index.ts"],
       "@features/*": ["src/features/*"],
 

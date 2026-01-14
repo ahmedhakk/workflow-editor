@@ -76,6 +76,11 @@
     "zoomOut": "Zoom out",
     "fitView": "Fit view"
   },
+  "pageNotFound": {
+    "title": "Page Not Found",
+    "message": "The page you are looking for could not be found 😢",
+    "goBack": "Go back"
+  },
   "nodes": {
     "trigger": "Trigger",
     "condition": "Condition",
